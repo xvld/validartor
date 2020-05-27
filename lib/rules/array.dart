@@ -1,5 +1,4 @@
-import 'package:validator/base_rule.dart';
-import 'package:validator/rules/dynamic.dart';
+import 'package:validartor/base_rule.dart';
 
 class ArrayValidatorRule<T> implements ValidatorRule<T> {
   ArrayValidatorRule(

@@ -1,5 +1,5 @@
-import 'package:validator/base_rule.dart';
-import 'package:validator/validation_exception.dart';
+import 'package:validartor/validation_exception.dart';
+import 'package:validartor/base_rule.dart';
 
 class EnumValidatorRule implements ValidatorRule {
   EnumValidatorRule({this.nullable = false, List<String> values = const []})

@@ -1,7 +1,7 @@
 import 'package:validartor/base_rule.dart';
 
-class ArrayValidatorRule<T> implements ValidatorRule<T> {
-  ArrayValidatorRule(
+class ListValidatorRule<T> implements ValidatorRule<T> {
+  ListValidatorRule(
       {this.nullable = false,
       this.empty = false,
       this.minLength = 0,

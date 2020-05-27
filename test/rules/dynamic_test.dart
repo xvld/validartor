@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:validator/rules/dynamic.dart';
-import 'package:validator/validation_exception.dart';
+import 'package:test/test.dart';
+import 'package:validartor/rules/dynamic.dart';
+import 'package:validartor/validation_exception.dart';
 
 void main() {
   test('validates non nullable dynamic value correctly', () {

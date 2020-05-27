@@ -1,14 +1,21 @@
-# validator
+# vali*dart*or
 
-A new Flutter package project.
+An easy to user and extendable input validator library in pure dart
 
-## Getting Started
+Inspired by [fastest-validator](https://github.com/icebob/fastest-validator) for nodeJs by [icebob](https://github.com/icebob).
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+## This repository is still a WIP
+Contributions are always welcome
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## Roadmap
+- [ ] Basic validation rules:
+    - [ ] boolean
+    - [ ] dynamic
+    - [ ] enum
+    - [ ] string
+    - [ ] number
+    - [ ] null
+- [ ] Advanced validation rules:
+    - [ ] List
+    - [ ] Map
+    - [ ] Multi

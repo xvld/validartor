@@ -12,6 +12,8 @@ class DynamicValidatorRule implements ValidatorRule {
   bool validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException('dynamic', 'null');
+    } else if (nullable && value == null) {
+      return true;
     }
 
     if (additionalValidators.isNotEmpty &&

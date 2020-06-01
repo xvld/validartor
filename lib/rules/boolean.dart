@@ -1,8 +1,9 @@
 import 'package:validartor/base_rule.dart';
 import 'package:validartor/validation_exception.dart';
 
-class DynamicValidatorRule implements ValidatorRule {
-  DynamicValidatorRule({this.nullable = false, this.allowTruthyValues = false});
+class BooleanValidatorRule implements ValidatorRule {
+  BooleanValidatorRule(
+      {this.nullable = false, this.allowTruthyValues = false, this.expected});
 
   bool nullable;
   bool allowTruthyValues;
@@ -13,6 +14,8 @@ class DynamicValidatorRule implements ValidatorRule {
     if (!nullable && value == null) {
       throw ValidationException.nullException(
           'bool', value?.runtimeType ?? 'null');
+    } else if (nullable && value == null) {
+      return true;
     }
 
     if (!allowTruthyValues && !(value is bool)) {
@@ -22,20 +25,21 @@ class DynamicValidatorRule implements ValidatorRule {
 
     if (allowTruthyValues && !(value is bool)) {
       if (value is String) {
-        if (!(value.toLowerCase() != 'true' &&
-            value.toLowerCase() != 'false')) {
+        if (value.toLowerCase() != 'true' && value.toLowerCase() != 'false') {
           throw ValidationException('Value is not a string truthy value',
               "'true'|'false'", value?.toString() ?? 'null');
         }
-      } else if (value is int) {
-        if (!(value != 0 && value != 1)) {
+        value = value == 'true';
+      } else if (value is num) {
+        if (value != 0 && value != 1) {
           throw ValidationException('Value is not an int truthy value', "1|0",
               value?.toString() ?? 'null');
         }
+        value = value == 1;
       } else {
         throw ValidationException(
             'Value is not a boolean and not a truthy value',
-            "bool|'true'|'false'|1|0",
+            "true|false|'true'|'false'|1|0",
             value?.toString() ?? 'null');
       }
     }

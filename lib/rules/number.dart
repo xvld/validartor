@@ -6,10 +6,13 @@ class NumberValidatorRule implements ValidatorRule {
       {this.nullable = false,
       this.allowStringValues = false,
       this.integer = false,
+      this.expected,
+      this.notEqualTo,
       this.min = double.negativeInfinity,
       this.max = double.infinity,
       this.onlyPositive = false,
-      this.onlyNegative = false});
+      this.onlyNegative = false,
+      this.additionalValidators = const []});
 
   bool nullable;
   bool allowStringValues;
@@ -42,7 +45,14 @@ class NumberValidatorRule implements ValidatorRule {
       throw ValidationException(
           'Value is not a number', 'int|double', value?.runtimeType ?? 'null');
     } else if (allowStringValues && value is String) {
-      value = num.parse(value); // set to double to continue
+      try {
+        value = num.parse(value); // set to double to continue
+      } catch (_) {
+        throw ValidationException(
+            'Value is a string that isnt parsable to a number',
+            expected.toString(),
+            value.toString());
+      }
     }
 
     if (expected != null && expected != value) {

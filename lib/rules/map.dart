@@ -4,22 +4,31 @@ class MapValidatorRule implements ValidatorRule {
   MapValidatorRule(this.validationMap,
       {this.nullable = false,
       this.strict = false,
-      this.props,
-      this.minProps,
-      this.maxProps});
+      this.blacklistedKeys = const [],
+      this.keys,
+      this.minNumOfKeys,
+      this.maxNumOfKeys});
+
+  // TODO: see combinations and throw errors on invalid prop combinations
 
   final Map<String, ValidatorRule> validationMap;
   bool nullable;
   bool ignoreAdditionalFields;
   bool strict;
 
-  List<String> props;
-  num minProps;
-  num maxProps;
+  List<String> keys;
+  List<String> blacklistedKeys;
+  num minNumOfKeys;
+  num maxNumOfKeys;
 
-  factory MapValidatorRule.simple({props, strict, minProps, maxProps}) =>
+  factory MapValidatorRule.simple(
+          {keys, strict, blacklistedKeys, minNumOfKeys, maxNumOfKeys}) =>
       MapValidatorRule(null,
-          props: props, strict: strict, minProps: minProps, maxProps: maxProps);
+          keys: keys,
+          strict: strict,
+          blacklistedKeys: blacklistedKeys,
+          minNumOfKeys: minNumOfKeys,
+          maxNumOfKeys: maxNumOfKeys);
 
   @override
   bool validate(value) {

@@ -1,45 +1,62 @@
 import 'package:validartor/base_rule.dart';
 import 'package:validartor/validation_exception.dart';
 
-class BooleanValidatorRule implements ValidatorRule {
+class BooleanValidatorRule implements ValidatorRule<bool> {
   BooleanValidatorRule(
-      {this.nullable = false, this.allowTruthyValues = false, this.expected});
+      {this.nullable = false,
+      this.allowTruthyFalsyValues = false,
+      this.expected,
+      this.treatNullAsFalse = false,
+      this.truthyValues = defaultTruthyValues,
+      this.falsyValues = defaultFalsyValues});
 
   bool nullable;
-  bool allowTruthyValues;
+  bool allowTruthyFalsyValues; // Sanitizer
   bool expected;
+  bool treatNullAsFalse; // Sanitizer
+  List<dynamic> truthyValues;
+  List<dynamic> falsyValues;
+
+  static const List<dynamic> defaultTruthyValues = ['true', 1];
+  static const List<dynamic> defaultFalsyValues = ['false', 0];
 
   @override
-  bool validate(value) {
+  bool validate(dynamic value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(
           'bool', value?.runtimeType ?? 'null');
     } else if (nullable && value == null) {
-      return true;
+      return treatNullAsFalse ? false : null;
     }
 
-    if (!allowTruthyValues && !(value is bool)) {
+    if (!allowTruthyFalsyValues && !(value is bool)) {
       throw ValidationException(
           'Value is not a boolean', 'bool', value?.runtimeType ?? 'null');
     }
 
-    if (allowTruthyValues && !(value is bool)) {
-      if (value is String) {
-        if (value.toLowerCase() != 'true' && value.toLowerCase() != 'false') {
-          throw ValidationException('Value is not a string truthy value',
-              "'true'|'false'", value?.toString() ?? 'null');
+    if (allowTruthyFalsyValues && !(value is bool)) {
+      final notOneTruthyValuePassed = !truthyValues.any((truthyValue) {
+        if ((truthyValue.runtimeType == value.runtimeType &&
+            truthyValue == value)) {
+          value = true;
+          return true;
         }
-        value = value == 'true';
-      } else if (value is num) {
-        if (value != 0 && value != 1) {
-          throw ValidationException('Value is not an int truthy value', "1|0",
-              value?.toString() ?? 'null');
+        return false;
+      });
+
+      final notOneFalsyValuePassed = !falsyValues.any((falsyValue) {
+        if ((falsyValue.runtimeType == value.runtimeType &&
+            falsyValue == value)) {
+          value = false;
+          return true;
         }
-        value = value == 1;
-      } else {
+        return false;
+      });
+
+      if (notOneTruthyValuePassed && notOneFalsyValuePassed) {
         throw ValidationException(
-            'Value is not a boolean and not a truthy value',
-            "true|false|'true'|'false'|1|0",
+            'Value is not a truthy or falsy value',
+            (<dynamic>[]..addAll(truthyValues)..addAll(falsyValues)).join('|'),
             value?.toString() ?? 'null');
       }
     }
@@ -49,6 +66,6 @@ class BooleanValidatorRule implements ValidatorRule {
           value?.toString() ?? 'null');
     }
 
-    return true;
+    return value;
   }
 }

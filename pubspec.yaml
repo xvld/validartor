@@ -2,7 +2,10 @@ name: validartor
 description: A custom and extendable input validator library in dart.
 version: 0.0.1
 author: vladi.r95@gmail.com
-homepage:
+homepage: https://github.com/vladir95/validartor
+repository: https://github.com/vladir95/validartor
+issue_tracker: https://github.com/vladir95/validartor/issues
+documentation: https://github.com/vladir95/validartor/blob/master/README.md
 
 environment:
   sdk: '>=2.1.0 <3.0.0'

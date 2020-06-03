@@ -30,6 +30,9 @@ class ListValidatorRule<T> implements ValidatorRule<List<T>> {
   List<bool Function(dynamic)> additionalValidators;
 
   @override
+  Type type = List;
+
+  @override
   List<T> validate(value) {
     // if (!(value is List)) {
     //   return false;

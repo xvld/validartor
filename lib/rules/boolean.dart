@@ -21,17 +21,20 @@ class BooleanValidatorRule implements ValidatorRule<bool> {
   static const List<dynamic> defaultFalsyValues = ['false', 0];
 
   @override
+  Type type = bool;
+
+  @override
   bool validate(dynamic value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(
-          'bool', value?.runtimeType ?? 'null');
+          type.toString(), value?.runtimeType ?? 'null');
     } else if (nullable && value == null) {
       return treatNullAsFalse ? false : null;
     }
 
     if (!allowTruthyFalsyValues && !(value is bool)) {
-      throw ValidationException(
-          'Value is not a boolean', 'bool', value?.runtimeType ?? 'null');
+      throw ValidationException('Value is not a boolean', type.toString(),
+          value?.runtimeType ?? 'null');
     }
 
     if (allowTruthyFalsyValues && !(value is bool)) {

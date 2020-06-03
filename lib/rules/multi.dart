@@ -6,6 +6,8 @@ class MultiValidatorRule implements ValidatorRule {
 
   List<ValidatorRule> rules;
 
+  Type type = dynamic;
+
   @override
   bool validate(value) {
     bool pass = false;

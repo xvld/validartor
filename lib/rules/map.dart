@@ -1,6 +1,6 @@
 import 'package:validartor/base_rule.dart';
 
-class MapValidatorRule implements ValidatorRule {
+class MapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
   MapValidatorRule(this.validationMap,
       {this.nullable = false,
       this.strict = false,
@@ -31,13 +31,16 @@ class MapValidatorRule implements ValidatorRule {
           maxNumOfKeys: maxNumOfKeys);
 
   @override
-  bool validate(value) {
+  Type type = Map;
+
+  @override
+  Map<String, dynamic> validate(value) {
     if (!(value is Map<String, ValidatorRule>)) {
-      return false;
+      // return false;
     }
 
     if (!(value is Map<String, dynamic>)) {
-      return false;
+      // return false;
     }
 
     validationMap.forEach((key, validator) {
@@ -48,6 +51,6 @@ class MapValidatorRule implements ValidatorRule {
         validationMap.keys
             .any((element) => !validationMap.keys.contains(element))) {}
 
-    return true;
+    return value;
   }
 }

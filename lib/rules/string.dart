@@ -4,19 +4,19 @@ import 'package:validartor/validation_exception.dart';
 enum InputRemoveSpaces { left, right, both, all, none }
 enum InputType { alphabetic, numeric, alphaNumeric, lowerCase, upperCase }
 
-class StringValidatorRule implements ValidatorRule {
-  StringValidatorRule({
-    this.nullable = false,
-    this.acceptEmpty = true,
-    this.inputTrim = InputRemoveSpaces.none,
-    this.length = double.infinity,
-    this.minLength = double.negativeInfinity,
-    this.maxLength = double.infinity,
-    this.pattern,
-    this.contains,
-    this.inputTypes = const [],
-    this.ignoredCharsInInputTypeChecks = const [],
-  });
+class StringValidatorRule implements ValidatorRule<String> {
+  StringValidatorRule(
+      {this.nullable = false,
+      this.acceptEmpty = true,
+      this.inputTrim = InputRemoveSpaces.none,
+      this.length = double.infinity,
+      this.minLength = double.negativeInfinity,
+      this.maxLength = double.infinity,
+      this.pattern,
+      this.contains,
+      this.inputTypes = const [],
+      this.ignoredCharsInInputTypeChecks = const [],
+      this.allowedValues = const []});
 
   bool nullable;
   bool acceptEmpty;
@@ -33,13 +33,18 @@ class StringValidatorRule implements ValidatorRule {
 
   List<String> ignoredCharsInInputTypeChecks;
 
+  List<String> allowedValues;
+
   @override
-  bool validate(value) {
+  Type type = String;
+
+  @override
+  String validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(
-          'string', value?.runtimeType ?? 'null');
+          type.toString(), value?.runtimeType ?? 'null');
     }
 
-    return true;
+    return value;
   }
 }

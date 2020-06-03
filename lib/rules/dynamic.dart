@@ -9,9 +9,12 @@ class DynamicValidatorRule implements ValidatorRule {
   List<bool Function(dynamic)> additionalValidators;
 
   @override
+  Type type = dynamic;
+
+  @override
   bool validate(value) {
     if (!nullable && value == null) {
-      throw ValidationException.nullException('dynamic', 'null');
+      throw ValidationException.nullException(type.toString(), 'null');
     } else if (nullable && value == null) {
       return true;
     }

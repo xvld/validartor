@@ -33,6 +33,9 @@ class NumberValidatorRule implements ValidatorRule {
   bool _valueIsNumber(dynamic value) => value is num;
 
   @override
+  Type type = num;
+
+  @override
   bool validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(

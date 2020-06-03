@@ -5,6 +5,9 @@ class NullValidatorRule implements ValidatorRule {
   NullValidatorRule();
 
   @override
+  Type type = Null;
+
+  @override
   bool validate(value) {
     if (value != null) {
       throw ValidationException('Value is not null', 'null', value.runtimeType);

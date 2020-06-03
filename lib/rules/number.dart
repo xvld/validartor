@@ -39,14 +39,14 @@ class NumberValidatorRule implements ValidatorRule {
   bool validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(
-          'int|double', value?.runtimeType ?? 'null');
+          type.toString(), value?.runtimeType ?? 'null');
     } else if (nullable && value == null) {
       return true;
     }
 
     if (!allowStringValues && !_valueIsNumber(value)) {
-      throw ValidationException(
-          'Value is not a number', 'int|double', value?.runtimeType ?? 'null');
+      throw ValidationException('Value is not a number', type.toString(),
+          value?.runtimeType ?? 'null');
     } else if (allowStringValues && value is String) {
       try {
         value = num.parse(value); // set to double to continue

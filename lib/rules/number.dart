@@ -1,7 +1,7 @@
 import 'package:validartor/base_rule.dart';
 import 'package:validartor/validation_exception.dart';
 
-class NumberValidatorRule implements ValidatorRule {
+class NumberValidatorRule implements ValidatorRule<num> {
   NumberValidatorRule(
       {this.nullable = false,
       this.allowStringValues = false,
@@ -12,10 +12,12 @@ class NumberValidatorRule implements ValidatorRule {
       this.max = double.infinity,
       this.onlyPositive = false,
       this.onlyNegative = false,
-      this.additionalValidators = const []});
+      this.additionalValidators = const [],
+      this.treatNullAs});
 
   bool nullable;
-  bool allowStringValues;
+  num treatNullAs; // Sanitizer
+  bool allowStringValues; // Sanitizer
 
   bool integer;
 
@@ -36,12 +38,12 @@ class NumberValidatorRule implements ValidatorRule {
   Type type = num;
 
   @override
-  bool validate(value) {
+  num validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(
           type.toString(), value?.runtimeType ?? 'null');
     } else if (nullable && value == null) {
-      return true;
+      return treatNullAs != null ? treatNullAs : null;
     }
 
     if (!allowStringValues && !_valueIsNumber(value)) {
@@ -100,6 +102,6 @@ class NumberValidatorRule implements ValidatorRule {
           value?.toString() ?? 'null');
     }
 
-    return true;
+    return value;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:validartor/base_rule.dart';
 import 'package:validartor/validation_exception.dart';
 
-class DynamicValidatorRule implements ValidatorRule {
+class DynamicValidatorRule implements ValidatorRule<dynamic> {
   DynamicValidatorRule(
       {this.nullable = false, this.additionalValidators = const []});
 
@@ -12,11 +12,11 @@ class DynamicValidatorRule implements ValidatorRule {
   Type type = dynamic;
 
   @override
-  bool validate(value) {
+  dynamic validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(type.toString(), 'null');
     } else if (nullable && value == null) {
-      return true;
+      return value;
     }
 
     if (additionalValidators.isNotEmpty &&
@@ -26,6 +26,6 @@ class DynamicValidatorRule implements ValidatorRule {
           value?.toString() ?? 'null');
     }
 
-    return true;
+    return value;
   }
 }

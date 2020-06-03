@@ -43,7 +43,7 @@ class NumberValidatorRule implements ValidatorRule<num> {
       throw ValidationException.nullException(
           type.toString(), value?.runtimeType ?? 'null');
     } else if (nullable && value == null) {
-      return treatNullAs != null ? treatNullAs : null;
+      return treatNullAs;
     }
 
     if (!allowStringValues && !_valueIsNumber(value)) {

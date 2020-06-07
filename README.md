@@ -1,6 +1,6 @@
-# vali*dart*or ✔
+# vali*dart*or ✅
 
-An easy to user and extendable input validator library in pure dart
+An easy to use and extendable input validator library written in pure dart, with no extra dependencies
 
 Inspired by [fastest-validator](https://github.com/icebob/fastest-validator) for nodeJs by [icebob](https://github.com/icebob).
 

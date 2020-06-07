@@ -11,7 +11,6 @@ Inspired by [fastest-validator](https://github.com/icebob/fastest-validator) for
 - [ ] Basic validation rules:
   - [x] boolean
   - [x] dynamic (any value)
-  - [x] enum
   - [x] number
   - [x] null
   - [ ] string **WIP**

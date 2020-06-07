@@ -1,10 +1,66 @@
-# vali*dart*or
+# vali*dart*or ✔
 
 An easy to user and extendable input validator library in pure dart
 
 Inspired by [fastest-validator](https://github.com/icebob/fastest-validator) for nodeJs by [icebob](https://github.com/icebob).
 
-**This repository is still a WIP**
+### **This repository is still a WIP**
+
+## Proposed Usage
+
+```dart
+final mapValidator = MapValidatorRule({
+  "id" : NumberValidatorRule(integer: true, allowStringValues: true),
+  "someNullFieldThatShouldntBeReturned": NullValidatorRule(),
+  "someNullFieldThatShouldntBeReturnedShorthand": null,
+  "exactValue": "value",
+  "admin": BooleanValidatorRule(nullable: true, treatNullAsFalse: true, allowTruthyFalsyValues: true),
+  "extra": DynamicValidatorRule(nullable: true, additionalValidators: [(value) => value != 'undefined']),
+  "age": NumberValidatorRule(integer: true, allowStringValues: true, onlyPositive: true,),
+  "userType": StringValidatorRule(nullable: true, treatNullAs: "normal", allowedValues: UserType.values),
+  "stringList": ListValidatorRule<String>(),
+  "stringOrBoolOrNumber": MultiValidatorRule([StringValidatorRule(), NumberValidatorRule(), BooleanValidatorRule()]),
+  "dynamicList": ListValidatorRule<dynamic>(rule: MultiValidatorRule([StringValidatorRule(), NumberValidatorRule()])),
+  "someDynamicMapThatWeDontCareALotAbout": MapValidatorRule.simple(blacklistedKeys: ["admin"]),
+  "nestedObject": MapValidatorRule({
+    "id" : NumberValidatorRule(integer: true, allowStringValues: true),
+    ...
+  })
+})
+
+// validatedMap will hold the output, sanitized
+
+try {
+  final validatedMap = mapValidator.validate({
+    "id" : 1,
+    "someNullFieldThatShouldntBeReturned": null,
+    "exactValue": "value",
+    "admin": true,
+    "extra": "any value",
+    "age": 25,
+    "userType": "normal",
+    "stringList": ["a", "b"],
+    "stringOrBoolOrNumber": true,
+    "dynamicList": [1, "a", 2, "b"],
+    "someDynamicMapThatWeDontCareALotAbout": {
+      "a": "b"
+    },
+    "nestedObject": {
+      "id": 1
+    }
+  })
+} on MultiValidationException catch (e) {
+  // Handle multiple objects mismatch
+}
+
+try {
+  // Can also be used to validate only one value
+  ListValidatorRule<String>().validate("1")
+} on ValidationException catch (e) {
+  // Handle single validation exception
+}
+
+```
 
 ## Roadmap
 
@@ -18,6 +74,7 @@ Inspired by [fastest-validator](https://github.com/icebob/fastest-validator) for
   - [x] Multi
   - [ ] List **WIP**
   - [ ] Map **WIP**
+- [ ] Exact validation rule ({"a": "b"}) without rule shorthand
 - [ ] Allow creation of schemas for validation
 - [ ] 0.1.0
 - [ ] Tests and complete coverage

@@ -7,7 +7,7 @@ enum InputType { alphabetic, numeric, alphaNumeric, lowerCase, upperCase }
 class StringValidatorRule implements ValidatorRule<String> {
   StringValidatorRule(
       {this.nullable = false,
-      this.treatNullAsEmptyString = false,
+      this.treatNullAs = null,
       this.acceptEmpty = true,
       this.inputTrim = InputTrimType.none,
       this.length = double.infinity,
@@ -20,7 +20,7 @@ class StringValidatorRule implements ValidatorRule<String> {
       this.allowedValues = const []});
 
   bool nullable;
-  bool treatNullAsEmptyString; // Sanitizer
+  String treatNullAs; // Sanitizer
   bool acceptEmpty;
   InputTrimType inputTrim; // Sanitizer
 
@@ -54,7 +54,7 @@ class StringValidatorRule implements ValidatorRule<String> {
       throw ValidationException.nullException(
           type.toString(), value?.runtimeType ?? 'null');
     } else if (nullable && value == null) {
-      return treatNullAsEmptyString ? '' : null;
+      return treatNullAs;
     }
 
     if (!(value is String)) {

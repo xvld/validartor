@@ -13,7 +13,8 @@ class ListValidatorRule<T> implements ValidatorRule<List<T>> {
       this.expectedValues,
       this.ordered,
       this.mustContainAllValues,
-      this.additionalValidators = const []});
+      this.additionalValidators = const [],
+      this.rule = null});
 
   bool nullable;
   bool empty;
@@ -26,6 +27,8 @@ class ListValidatorRule<T> implements ValidatorRule<List<T>> {
   List<T> expectedValues;
   bool ordered; // Implies mustContainAllValues=true
   bool mustContainAllValues;
+
+  ValidatorRule rule;
 
   List<bool Function(dynamic)> additionalValidators;
 

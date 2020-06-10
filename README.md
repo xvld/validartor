@@ -12,8 +12,6 @@ Inspired by [fastest-validator](https://github.com/icebob/fastest-validator) for
 final mapValidator = MapValidatorRule({
   "id" : NumberValidatorRule(integer: true, allowStringValues: true),
   "someNullFieldThatShouldntBeReturned": NullValidatorRule(),
-  "someNullFieldThatShouldntBeReturnedShorthand": null,
-  "exactValue": "value",
   "admin": BooleanValidatorRule(nullable: true, treatNullAsFalse: true, allowTruthyFalsyValues: true),
   "extra": DynamicValidatorRule(nullable: true, additionalValidators: [(value) => value != 'undefined']),
   "age": NumberValidatorRule(integer: true, allowStringValues: true, onlyPositive: true,),
@@ -21,11 +19,14 @@ final mapValidator = MapValidatorRule({
   "stringList": ListValidatorRule<String>(),
   "stringOrBoolOrNumber": MultiValidatorRule([StringValidatorRule(), NumberValidatorRule(), BooleanValidatorRule()]),
   "dynamicList": ListValidatorRule<dynamic>(rule: MultiValidatorRule([StringValidatorRule(), NumberValidatorRule()])),
-  "someDynamicMapThatWeDontCareALotAbout": MapValidatorRule.simple(blacklistedKeys: ["admin"]),
+  "someDynamicMapThatWeDontCareALotAbout": BasicMapValidatorRule(blacklistedKeys: ["admin"]),
   "nestedObject": MapValidatorRule({
     "id" : NumberValidatorRule(integer: true, allowStringValues: true),
     ...
   })
+})..withExactFields({
+  "someNullFieldThatShouldntBeReturnedShorthand": null,
+  "exactValue": "value"
 })
 
 // validatedMap will hold the output, sanitized

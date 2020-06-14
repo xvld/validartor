@@ -1,24 +1,22 @@
 import 'package:validartor/base_rule.dart';
+import 'package:validartor/common/enums.dart';
 
 import '../validation_exception.dart';
-
-enum ExtraFieldsBehaviour { remove, keep, error }
-enum ThrowBehaviour { multi, first }
 
 class BasicMapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
       {this.expectedFieldsMap = null,
       this.nullable = false,
-      this.extraFieldsBehaviour = ExtraFieldsBehaviour.keep,
+      this.extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
       this.blacklistedKeys = const [],
       this.allowedKeys = const [],
-      this.minNumOfKeys = double.negativeInfinity,
+      this.minNumOfKeys = 0,
       this.maxNumOfKeys = double.infinity,
       this.throwBehaviour = ThrowBehaviour.multi});
 
   Map<String, dynamic> expectedFieldsMap;
   bool nullable;
-  ExtraFieldsBehaviour extraFieldsBehaviour; // Sanitizer
+  MapExtraFieldsBehaviour extraFieldsBehaviour; // Sanitizer
   ThrowBehaviour throwBehaviour;
 
   List<String> allowedKeys;
@@ -48,16 +46,16 @@ class BasicMapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
       throw handleException(
           multiValidationException,
           ValidationException.nullException(
-              type.toString(), value?.runtimeType ?? 'null'));
+              type.toString(), value?.runtimeType?.toString() ?? 'null'));
     } else if (nullable && value == null) {
       return value;
     }
 
     if (!(value is Map)) {
-      handleException(
+      throw handleException(
           multiValidationException,
           ValidationException('Value is not a Map', type.toString(),
-              value?.runtimeType ?? 'null'));
+              value?.runtimeType?.toString() ?? 'null'));
     }
 
     final valueMap = Map.from(value).cast<String, dynamic>();
@@ -89,16 +87,16 @@ class BasicMapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
 
     final checkExtraFieldsBehaviour = (String key) {
       switch (extraFieldsBehaviour) {
-        case ExtraFieldsBehaviour.error:
+        case MapExtraFieldsBehaviour.error:
           handleException(
               multiValidationException,
               ValidationException('Map contains key $key',
                   'To not contain $key', value.toString()));
           break;
-        case ExtraFieldsBehaviour.remove:
+        case MapExtraFieldsBehaviour.remove:
           keysToRemove.add(key);
           break;
-        case ExtraFieldsBehaviour.keep:
+        case MapExtraFieldsBehaviour.keep:
         default:
       }
     };
@@ -170,7 +168,7 @@ class MapValidatorRule extends BasicMapValidatorRule
   MapValidatorRule(
     this.validationMap, {
     bool nullable = false,
-    ExtraFieldsBehaviour extraFieldsBehaviour = ExtraFieldsBehaviour.keep,
+    MapExtraFieldsBehaviour extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
     List<String> blacklistedKeys = const [],
     num minNumOfKeys,
     num maxNumOfKeys = double.infinity,

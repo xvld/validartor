@@ -1,110 +1,168 @@
 import 'package:validartor/base_rule.dart';
+import 'package:validartor/common/enums.dart';
+
+import '../validation_exception.dart';
 
 class ListValidatorRule<T> implements ValidatorRule<List<T>> {
   ListValidatorRule(
       {this.nullable = false,
-      this.empty = false,
+      this.allowEmpty = false,
+      this.treatNullAsEmptyList = false,
       this.minLength = 0,
-      this.maxLength,
+      this.maxLength = double.infinity,
       this.length,
-      this.contains,
-      this.containsPredicate,
+      this.mustContain,
+      this.mustContainPredicate,
       this.unique = false,
       this.expectedValues,
       this.ordered,
       this.mustContainAllValues,
       this.additionalValidators = const [],
-      this.rule = null});
+      this.elementRule = null,
+      this.throwBehaviour = ThrowBehaviour.multi});
 
   bool nullable;
-  bool empty;
-  int minLength;
-  int maxLength;
-  int length;
-  T contains;
-  bool Function(T) containsPredicate;
+  bool allowEmpty;
+  bool treatNullAsEmptyList;
+
+  num minLength;
+  num maxLength;
+  num length;
+  T mustContain;
+  bool Function(T) mustContainPredicate;
   bool unique;
   List<T> expectedValues;
   bool ordered; // Implies mustContainAllValues=true
   bool mustContainAllValues;
 
-  ValidatorRule rule;
+  ValidatorRule elementRule;
+  ThrowBehaviour throwBehaviour;
 
   List<bool Function(dynamic)> additionalValidators;
 
   @override
   Type type = List;
 
+  handleException(MultiValidationException multiValidationException,
+      ValidationException exception) {
+    if (throwBehaviour == ThrowBehaviour.first) {
+      throw exception;
+    }
+
+    multiValidationException.exceptions.add(exception);
+    return multiValidationException;
+  }
+
   @override
   List<T> validate(value) {
-    // if (!(value is List)) {
-    //   return false;
-    // }
+    MultiValidationException multiValidationException =
+        MultiValidationException('List validation failed', []);
 
-    // final list = value as List<T>;
+    if (!nullable && value == null) {
+      throw handleException(
+          multiValidationException,
+          ValidationException.nullException(
+              type.toString(), value?.runtimeType ?? 'null'));
+    } else if (nullable && value == null) {
+      return treatNullAsEmptyList ? [] : value;
+    }
 
-    // if (!nullable && list == null) {
-    //   return false;
-    // }
+    if (!(value is List)) {
+      throw handleException(
+          multiValidationException,
+          ValidationException('Value is not a Map', type.toString(),
+              value?.runtimeType ?? 'null'));
+    }
 
-    // if (empty && list.isNotEmpty) {
-    //   return false;
-    // }
+    final list = value as List<T>;
 
-    // if (length != null && list.length != length) {
-    //   return false;
-    // }
+    if (!allowEmpty && list.isEmpty) {
+      throw handleException(
+          multiValidationException,
+          ValidationException('List cannot be empty', 'list.length > 0',
+              list.length.toString()));
+    }
 
-    // if (list.length < minLength) {
-    //   return false;
-    // }
+    if (length != null && list.length != length) {
+      handleException(
+          multiValidationException,
+          ValidationException('List length does not match expected length',
+              'list.length == $length', list.length.toString()));
+    }
 
-    // if (maxLength != null && list.length > maxLength) {
-    //   return false;
-    // }
+    if (list.length < minLength) {
+      handleException(
+          multiValidationException,
+          ValidationException('List length is below minLength', '>= $minLength',
+              list.length.toString()));
+    }
 
-    // if (contains != null && list.indexOf(contains) == -1) {
-    //   return false;
-    // }
+    if (maxLength != null && list.length > maxLength) {
+      handleException(
+          multiValidationException,
+          ValidationException('List length exceeds maxLength', '<= $maxLength',
+              list.length.toString()));
+    }
 
-    // if (containsPredicate != null &&
-    //     list.firstWhere(containsPredicate, orElse: () => null) == null) {
-    //   return false;
-    // }
+    if (mustContain != null && list.indexOf(mustContain) == -1) {
+      handleException(
+          multiValidationException,
+          ValidationException('List does not contain expected value',
+              '$mustContain', list.join(',')));
+    }
 
-    // if (unique && Set.from(list).length != list.length) {
-    //   return false;
-    // }
+    if (mustContainPredicate != null &&
+        list.firstWhere(mustContainPredicate, orElse: () => null) == null) {
+      handleException(
+          multiValidationException,
+          ValidationException(
+              'List does not contain expected value with predicate',
+              'predicate given',
+              list.join(',')));
+    }
 
-    // if (expectedValues != null) {
-    //   final map = {};
-    //   if (mustContainAllValues && expectedValues.length != list.length) {
-    //     return false;
-    //   }
+    if (unique && Set.from(list).length != list.length) {
+      handleException(
+          multiValidationException,
+          ValidationException('List contains non-unique values',
+              Set.from(list).join(','), list.join(',')));
+    }
 
-    //   for (int i = 0; i < list.length; i++) {
-    //     if (ordered) {
-    //       if (expectedValues[i] != list[i]) {
-    //         return false;
-    //       }
-    //     } else if (expectedValues.contains(list[i]) && mustContainAllValues) {
-    //       map[list[i]] = true;
-    //     } else if (!expectedValues.contains(list[i])) {
-    //       return false;
-    //     }
-    //   }
+    if (expectedValues != null) {
+      final map = {};
+      // WILL NOT WORK, ['a', 'a'] expected = ['a']
+      if (mustContainAllValues && expectedValues.length != list.length) {
+        return false;
+      }
 
-    //   if (mustContainAllValues && map.keys.length != expectedValues.length) {
-    //     return false;
-    //   }
-    // }
+      for (int i = 0; i < list.length; i++) {
+        if (ordered) {
+          if (expectedValues[i] != list[i]) {
+            return false;
+          }
+        } else if (expectedValues.contains(list[i]) && mustContainAllValues) {
+          map[list[i]] = true;
+        } else if (!expectedValues.contains(list[i])) {
+          return false;
+        }
+      }
 
-    // if (additionalValidators.isNotEmpty &&
-    //     !additionalValidators.fold(
-    //         true, (foldValue, validator) => foldValue && validator(list))) {
-    //   return false;
-    // }
+      if (mustContainAllValues && map.keys.length != expectedValues.length) {
+        return false;
+      }
+    }
 
-    // return true;
+    if (additionalValidators.isNotEmpty &&
+        !additionalValidators.fold(
+            true, (foldValue, validator) => foldValue && validator(value))) {
+      throw ValidationException(
+          'Value did not pass custom validator', "", value?.toString());
+    }
+
+    if (multiValidationException.exceptions.isNotEmpty) {
+      throw multiValidationException;
+    }
+
+    return list;
   }
 }

@@ -9,18 +9,20 @@ class MultiValidatorRule implements ValidatorRule {
   Type type = dynamic;
 
   @override
-  bool validate(value) {
-    bool pass = false;
-    List<ValidationException> exceptions;
+  dynamic validate(value) {
+    dynamic pass;
+    List<ValidationException> exceptions = [];
+
     for (ValidatorRule rule in rules) {
       try {
         pass = rule.validate(value);
+        break;
       } on ValidationException catch (e) {
         exceptions.add(e);
       }
     }
 
-    if (pass == false) {
+    if (exceptions.isNotEmpty && pass == null) {
       throw MultiValidationException(
           'Value did not match any of the rules given', exceptions);
     }

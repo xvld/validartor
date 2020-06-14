@@ -10,7 +10,8 @@ class NullValidatorRule implements ValidatorRule<Null> {
   @override
   Null validate(value) {
     if (value != null) {
-      throw ValidationException('Value is not null', 'null', value.runtimeType);
+      throw ValidationException(
+          'Value is not null', 'null', value?.runtimeType);
     }
 
     return null;

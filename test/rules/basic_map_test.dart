@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import 'package:validartor/common/enums.dart';
 import 'package:validartor/rules/map.dart';
 import 'package:validartor/validation_exception.dart';
 
@@ -18,6 +19,13 @@ void main() {
     final validator = BasicMapValidatorRule(nullable: true);
 
     expect(validator.validate(null), null);
+  });
+
+  test('Should validate non map value correctly', () {
+    final validator = BasicMapValidatorRule();
+
+    expect(
+        () => validator.validate(1), throwsA(isA<MultiValidationException>()));
   });
 
   test('Should validate minNumOfKeys map value correctly', () {
@@ -62,10 +70,10 @@ void main() {
     expectedMap.remove("a");
     expect(validator.validate(map), map);
 
-    validator.extraFieldsBehaviour = ExtraFieldsBehaviour.remove;
+    validator.extraFieldsBehaviour = MapExtraFieldsBehaviour.remove;
     expect(validator.validate(map), expectedMap);
 
-    validator.extraFieldsBehaviour = ExtraFieldsBehaviour.error;
+    validator.extraFieldsBehaviour = MapExtraFieldsBehaviour.error;
     expect(() => validator.validate(map),
         throwsA(isA<MultiValidationException>()));
 

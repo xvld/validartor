@@ -37,7 +37,6 @@ class StringValidatorRule implements ValidatorRule<String> {
 
   List<String> allowedValues;
 
-  @override
   Type type = String;
 
   static Map<InputType, RegExp> _inputTypeToRegExp = {
@@ -48,7 +47,6 @@ class StringValidatorRule implements ValidatorRule<String> {
     InputType.upperCase: RegExp(r"[A-Z\d\s]*")
   };
 
-  @override
   String validate(value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(

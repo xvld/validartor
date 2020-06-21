@@ -18,5 +18,5 @@ class MultiValidationException implements Exception {
   MultiValidationException(this.message, this.exceptions);
 
   final dynamic message;
-  final List<ValidationException> exceptions;
+  List<ValidationException> exceptions;
 }

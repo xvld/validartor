@@ -8,7 +8,6 @@ class MultiValidatorRule implements ValidatorRule {
 
   Type type = dynamic;
 
-  @override
   dynamic validate(value) {
     dynamic pass;
     List<ValidationException> exceptions = [];

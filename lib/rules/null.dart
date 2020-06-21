@@ -4,10 +4,8 @@ import 'package:validartor/validation_exception.dart';
 class NullValidatorRule implements ValidatorRule<Null> {
   NullValidatorRule();
 
-  @override
   Type type = Null;
 
-  @override
   Null validate(value) {
     if (value != null) {
       throw ValidationException(

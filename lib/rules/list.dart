@@ -1,9 +1,12 @@
 import 'package:validartor/base_rule.dart';
 import 'package:validartor/common/enums.dart';
+import 'package:validartor/common/multi_exception_handler.dart';
 
 import '../validation_exception.dart';
 
-class ListValidatorRule<T> implements ValidatorRule<List<T>> {
+class ListValidatorRule<T>
+    with MultiExceptionHandler
+    implements ValidatorRule<List<T>> {
   ListValidatorRule(
       {this.nullable = false,
       this.allowEmpty = false,
@@ -19,7 +22,9 @@ class ListValidatorRule<T> implements ValidatorRule<List<T>> {
       this.mustContainAllValues,
       this.additionalValidators = const [],
       this.elementRule = null,
-      this.throwBehaviour = ThrowBehaviour.multi});
+      ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
+    throwBehaviour = throwBehaviour;
+  }
 
   bool nullable;
   bool allowEmpty;
@@ -36,24 +41,11 @@ class ListValidatorRule<T> implements ValidatorRule<List<T>> {
   bool mustContainAllValues;
 
   ValidatorRule elementRule;
-  ThrowBehaviour throwBehaviour;
 
   List<bool Function(dynamic)> additionalValidators;
 
-  @override
   Type type = List;
 
-  handleException(MultiValidationException multiValidationException,
-      ValidationException exception) {
-    if (throwBehaviour == ThrowBehaviour.first) {
-      throw exception;
-    }
-
-    multiValidationException.exceptions.add(exception);
-    return multiValidationException;
-  }
-
-  @override
   List<T> validate(value) {
     MultiValidationException multiValidationException =
         MultiValidationException('List validation failed', []);

@@ -1,9 +1,12 @@
 import 'package:validartor/base_rule.dart';
 import 'package:validartor/common/enums.dart';
+import 'package:validartor/common/multi_exception_handler.dart';
 
 import '../validation_exception.dart';
 
-class BasicMapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
+class BasicMapValidatorRule
+    with MultiExceptionHandler
+    implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
       {this.expectedFieldsMap = null,
       this.nullable = false,
@@ -12,32 +15,21 @@ class BasicMapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
       this.allowedKeys = const [],
       this.minNumOfKeys = 0,
       this.maxNumOfKeys = double.infinity,
-      this.throwBehaviour = ThrowBehaviour.multi});
+      ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
+    throwBehaviour = throwBehaviour;
+  }
 
   Map<String, dynamic> expectedFieldsMap;
   bool nullable;
   MapExtraFieldsBehaviour extraFieldsBehaviour; // Sanitizer
-  ThrowBehaviour throwBehaviour;
 
   List<String> allowedKeys;
   List<String> blacklistedKeys;
   num minNumOfKeys;
   num maxNumOfKeys;
 
-  @override
   Type type = Map;
 
-  handleException(MultiValidationException multiValidationException,
-      ValidationException exception) {
-    if (throwBehaviour == ThrowBehaviour.first) {
-      throw exception;
-    }
-
-    multiValidationException.exceptions.add(exception);
-    return multiValidationException;
-  }
-
-  @override
   Map<String, dynamic> validate(value) {
     MultiValidationException multiValidationException =
         MultiValidationException('Map validation failed', []);
@@ -165,32 +157,38 @@ class BasicMapValidatorRule implements ValidatorRule<Map<String, dynamic>> {
 
 class MapValidatorRule extends BasicMapValidatorRule
     implements ValidatorRule<Map<String, dynamic>> {
-  MapValidatorRule(
-    this.validationMap, {
-    bool nullable = false,
-    MapExtraFieldsBehaviour extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
-    List<String> blacklistedKeys = const [],
-    num minNumOfKeys,
-    num maxNumOfKeys = double.infinity,
-    Map<String, dynamic> additionalExpectedFieldsMap = null,
-  }) : super(
+  MapValidatorRule(this.validationMap,
+      {bool nullable = false,
+      MapExtraFieldsBehaviour extraFieldsBehaviour =
+          MapExtraFieldsBehaviour.keep,
+      List<String> blacklistedKeys = const [],
+      Map<String, dynamic> additionalExpectedFieldsMap = null,
+      ThrowBehaviour throwBehaviour = ThrowBehaviour.multi})
+      : super(
+          throwBehaviour: throwBehaviour,
           expectedFieldsMap: additionalExpectedFieldsMap,
           nullable: nullable,
           extraFieldsBehaviour: extraFieldsBehaviour,
           blacklistedKeys: blacklistedKeys,
-          minNumOfKeys: minNumOfKeys,
-          maxNumOfKeys: maxNumOfKeys,
         );
 
   // TODO: see combinations and throw errors on invalid prop combinations
 
   final Map<String, ValidatorRule> validationMap;
 
-  @override
   Type type = Map;
 
   @override
   Map<String, dynamic> validate(value) {
+    MultiValidationException multiValidationException =
+        MultiValidationException('Map validation failed', []);
+
+    try {
+      super.validate(value);
+    } on MultiValidationException catch (exception) {
+      multiValidationException.exceptions = exception.exceptions;
+    }
+
     if (!(value is Map<String, ValidatorRule>)) {
       // return false;
     }

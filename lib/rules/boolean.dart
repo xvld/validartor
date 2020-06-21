@@ -20,10 +20,8 @@ class BooleanValidatorRule implements ValidatorRule<bool> {
   static const List<dynamic> defaultTruthyValues = ['true', 1];
   static const List<dynamic> defaultFalsyValues = ['false', 0];
 
-  @override
   Type type = bool;
 
-  @override
   bool validate(dynamic value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(

@@ -36,9 +36,7 @@ class BasicMapValidatorRule
 
     if (!nullable && value == null) {
       throw handleException(
-          multiValidationException,
-          ValidationException.nullException(
-              type.toString(), value?.runtimeType?.toString() ?? 'null'));
+          multiValidationException, ValidationException.nullException(type));
     } else if (nullable && value == null) {
       return value;
     }
@@ -175,6 +173,11 @@ class MapValidatorRule extends BasicMapValidatorRule
   // TODO: see combinations and throw errors on invalid prop combinations
 
   final Map<String, ValidatorRule> validationMap;
+
+  void withAdditionalExactFields(
+      Map<String, dynamic> additionalExpectedFieldsMap) {
+    expectedFieldsMap = additionalExpectedFieldsMap;
+  }
 
   Type type = Map;
 

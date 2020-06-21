@@ -12,7 +12,7 @@ class DynamicValidatorRule implements ValidatorRule<dynamic> {
 
   dynamic validate(value) {
     if (!nullable && value == null) {
-      throw ValidationException.nullException(type.toString(), 'null');
+      throw ValidationException.nullException(type);
     } else if (nullable && value == null) {
       return value;
     }
@@ -20,8 +20,7 @@ class DynamicValidatorRule implements ValidatorRule<dynamic> {
     if (additionalValidators.isNotEmpty &&
         !additionalValidators.fold(
             true, (foldValue, validator) => foldValue && validator(value))) {
-      throw ValidationException('Value did not pass custom validator', "",
-          value?.toString() ?? 'null');
+      throw ValidationException.customValidator();
     }
 
     return value;

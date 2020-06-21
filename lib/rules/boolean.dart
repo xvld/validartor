@@ -24,15 +24,13 @@ class BooleanValidatorRule implements ValidatorRule<bool> {
 
   bool validate(dynamic value) {
     if (!nullable && value == null) {
-      throw ValidationException.nullException(
-          type.toString(), value?.runtimeType ?? 'null');
+      throw ValidationException.nullException(type);
     } else if (nullable && value == null) {
       return treatNullAsFalse ? false : null;
     }
 
     if (!allowTruthyFalsyValues && !(value is bool)) {
-      throw ValidationException('Value is not a boolean', type.toString(),
-          value?.runtimeType ?? 'null');
+      throw ValidationException.invalidType(type, value.runtimeType);
     }
 
     if (allowTruthyFalsyValues && !(value is bool)) {
@@ -55,16 +53,15 @@ class BooleanValidatorRule implements ValidatorRule<bool> {
       });
 
       if (notOneTruthyValuePassed && notOneFalsyValuePassed) {
-        throw ValidationException(
-            'Value is not a truthy or falsy value',
+        throw ValidationException.cannotConvert(
             (<dynamic>[]..addAll(truthyValues)..addAll(falsyValues)).join('|'),
-            value?.toString() ?? 'null');
+            value);
       }
     }
 
     if (expected != null && value != expected) {
-      throw ValidationException('Value is not as expected', expected.toString(),
-          value?.toString() ?? 'null');
+      throw ValidationException.notAsExpected(
+          expected.toString(), value.toString());
     }
 
     return value;

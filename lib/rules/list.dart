@@ -52,9 +52,7 @@ class ListValidatorRule<T>
 
     if (!nullable && value == null) {
       throw handleException(
-          multiValidationException,
-          ValidationException.nullException(
-              type.toString(), value?.runtimeType ?? 'null'));
+          multiValidationException, ValidationException.nullException(type));
     } else if (nullable && value == null) {
       return treatNullAsEmptyList ? [] : value;
     }

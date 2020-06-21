@@ -38,8 +38,7 @@ class NumberValidatorRule implements ValidatorRule<num> {
 
   num validate(value) {
     if (!nullable && value == null) {
-      throw ValidationException.nullException(
-          type.toString(), value?.runtimeType ?? 'null');
+      throw ValidationException.nullException(type);
     } else if (nullable && value == null) {
       return treatNullAs;
     }

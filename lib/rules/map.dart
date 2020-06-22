@@ -10,9 +10,9 @@ import '../common/validation_exception.dart';
 class BasicMapValidatorRule
     with
         MultiExceptionHandler,
-        NullValidator<Map<String, dynamic>>,
+        NullableValidation<Map<String, dynamic>>,
         AdditionalValidators,
-        MinMaxValidator
+        MinMaxExactValidation
     implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
       {this.expectedFieldsMap = null,

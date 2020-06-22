@@ -5,7 +5,7 @@ import './base_rule.dart';
 import '../common/validation_exception.dart';
 
 class NumberValidatorRule
-    with NullValidator<num>, AdditionalValidators, MinMaxValidator
+    with NullableValidation<num>, AdditionalValidators, MinMaxExactValidation
     implements ValidatorRule<num> {
   NumberValidatorRule(
       {bool nullable = false,

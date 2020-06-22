@@ -1,6 +1,6 @@
 import 'package:validartor/common/validation_exception.dart';
 
-mixin MinMaxValidator {
+mixin MinMaxExactValidation {
   validateMinMaxExact(num value, num min, num max, num expected,
       {String checkedValueName = 'Value'}) {
     if (expected != null && expected != value) {

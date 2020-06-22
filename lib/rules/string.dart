@@ -9,7 +9,7 @@ enum InputTrimType { left, right, both, all, none }
 enum InputType { alphabetic, numeric, alphaNumeric, lowerCase, upperCase }
 
 class StringValidatorRule
-    with NullValidator<String>, AdditionalValidators, MinMaxValidator
+    with NullableValidation<String>, AdditionalValidators, MinMaxExactValidation
     implements ValidatorRule<String> {
   StringValidatorRule(
       {nullable = false,

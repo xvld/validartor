@@ -3,7 +3,7 @@ import '../common/null_validator.dart';
 import '../common/additional_validators.dart';
 
 class DynamicValidatorRule
-    with NullValidator<dynamic>, AdditionalValidators
+    with NullableValidation<dynamic>, AdditionalValidators
     implements ValidatorRule<dynamic> {
   DynamicValidatorRule(
       {bool nullable = false,

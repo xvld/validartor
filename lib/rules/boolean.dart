@@ -3,7 +3,7 @@ import '../common/null_validator.dart';
 import '../common/validation_exception.dart';
 
 class BooleanValidatorRule
-    with NullValidator<bool>
+    with NullableValidation<bool>
     implements ValidatorRule<bool> {
   BooleanValidatorRule(
       {bool nullable = false,

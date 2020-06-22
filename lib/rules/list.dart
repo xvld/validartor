@@ -10,9 +10,9 @@ import '../common/validation_exception.dart';
 class ListValidatorRule<T extends dynamic>
     with
         MultiExceptionHandler,
-        NullValidator<List<T>>,
+        NullableValidation<List<T>>,
         AdditionalValidators,
-        MinMaxValidator
+        MinMaxExactValidation
     implements ValidatorRule<List<T>> {
   ListValidatorRule(
       {bool nullable = false,

@@ -10,7 +10,7 @@ import '../common/validation_exception.dart';
 ///     return treatNullAs;
 /// }
 
-mixin NullValidator<T> {
+mixin NullableValidation<T> {
   /// Whether value can be null or not
   bool nullable;
 

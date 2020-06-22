@@ -1,33 +1,33 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/validation_exception.dart';
+import './base_rule.dart';
+import '../common/null_validator.dart';
+import '../common/validation_exception.dart';
 
-class BooleanValidatorRule implements ValidatorRule<bool> {
+class BooleanValidatorRule
+    with NullValidator<bool>
+    implements ValidatorRule<bool> {
   BooleanValidatorRule(
-      {this.nullable = false,
+      {nullable = false,
+      treatNullAsFalse = false,
       this.allowTruthyFalsyValues = false,
       this.expected,
-      this.treatNullAsFalse = false,
       this.truthyValues = defaultTruthyValues,
-      this.falsyValues = defaultFalsyValues});
+      this.falsyValues = defaultFalsyValues}) {
+    this.nullable = nullable;
+    this.treatNullAs = treatNullAsFalse ? false : null;
+  }
 
-  bool nullable;
   bool allowTruthyFalsyValues; // Sanitizer
   bool expected;
-  bool treatNullAsFalse; // Sanitizer
   List<dynamic> truthyValues;
   List<dynamic> falsyValues;
 
   static const List<dynamic> defaultTruthyValues = ['true', 1];
   static const List<dynamic> defaultFalsyValues = ['false', 0];
 
-  Type type = bool;
+  final Type type = bool;
 
   bool validate(dynamic value) {
-    if (!nullable && value == null) {
-      throw ValidationException.nullException(type);
-    } else if (nullable && value == null) {
-      return treatNullAsFalse ? false : null;
-    }
+    validateNullable(value);
 
     if (!allowTruthyFalsyValues && !(value is bool)) {
       throw ValidationException.invalidType(type, value.runtimeType);

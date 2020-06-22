@@ -1,16 +1,17 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/common/enums.dart';
-import 'package:validartor/common/multi_exception_handler.dart';
+import './base_rule.dart';
+import '../common/null_validator.dart';
+import '../common/multi_exception_handler.dart';
+import '../common/additional_validators.dart';
+import '../common/enums.dart';
+import '../common/validation_exception.dart';
 
-import '../validation_exception.dart';
-
-class ListValidatorRule<T>
-    with MultiExceptionHandler
+class ListValidatorRule<T extends dynamic>
+    with MultiExceptionHandler, NullValidator<List<T>>, AdditionalValidators
     implements ValidatorRule<List<T>> {
   ListValidatorRule(
-      {this.nullable = false,
-      this.allowEmpty = false,
-      this.treatNullAsEmptyList = false,
+      {nullable = false,
+      treatNullAsEmptyList = false,
+      this.allowEmpty = true,
       this.minLength = 0,
       this.maxLength = double.infinity,
       this.length,
@@ -20,21 +21,24 @@ class ListValidatorRule<T>
       this.expectedValues,
       this.ordered,
       this.mustContainAllValues,
-      this.additionalValidators = const [],
+      additionalValidators = const [],
       this.elementRule = null,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
-    throwBehaviour = throwBehaviour;
+    this.nullable = nullable;
+    this.treatNullAs = treatNullAsEmptyList ? [] : null;
+    this.throwBehaviour = throwBehaviour;
+    this.additionalValidators = additionalValidators;
   }
 
-  bool nullable;
   bool allowEmpty;
-  bool treatNullAsEmptyList;
 
   num minLength;
   num maxLength;
   num length;
+
   T mustContain;
   bool Function(T) mustContainPredicate;
+
   bool unique;
   List<T> expectedValues;
   bool ordered; // Implies mustContainAllValues=true
@@ -42,19 +46,16 @@ class ListValidatorRule<T>
 
   ValidatorRule elementRule;
 
-  List<bool Function(dynamic)> additionalValidators;
-
   Type type = List;
 
   List<T> validate(value) {
     MultiValidationException multiValidationException =
         MultiValidationException('List validation failed', []);
 
-    if (!nullable && value == null) {
-      throw handleException(
-          multiValidationException, ValidationException.nullException(type));
-    } else if (nullable && value == null) {
-      return treatNullAsEmptyList ? [] : value;
+    try {
+      validateNullable(value);
+    } on ValidationException catch (e) {
+      throw handleException(multiValidationException, e);
     }
 
     if (!(value is List)) {
@@ -142,11 +143,10 @@ class ListValidatorRule<T>
       }
     }
 
-    if (additionalValidators.isNotEmpty &&
-        !additionalValidators.fold(
-            true, (foldValue, validator) => foldValue && validator(value))) {
-      throw ValidationException(
-          'Value did not pass custom validator', "", value?.toString());
+    try {
+      validateAdditionalValidators(value);
+    } on ValidationException catch (e) {
+      handleException(multiValidationException, e);
     }
 
     if (multiValidationException.exceptions.isNotEmpty) {

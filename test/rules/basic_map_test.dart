@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import 'package:validartor/common/enums.dart';
 import 'package:validartor/rules/map.dart';
-import 'package:validartor/validation_exception.dart';
+import 'package:validartor/common/validation_exception.dart';
 
 void main() {
   const map = {"a": "a", "b": 2, "c": null, "d": true};

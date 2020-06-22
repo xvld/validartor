@@ -1,9 +1,13 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/validation_exception.dart';
+import '../common/additional_validators.dart';
+import '../common/null_validator.dart';
+import './base_rule.dart';
+import '../common/validation_exception.dart';
 
-class NumberValidatorRule implements ValidatorRule<num> {
+class NumberValidatorRule
+    with NullValidator<num>, AdditionalValidators
+    implements ValidatorRule<num> {
   NumberValidatorRule(
-      {this.nullable = false,
+      {nullable = false,
       this.allowStringValues = false,
       this.integer = false,
       this.expected,
@@ -12,11 +16,13 @@ class NumberValidatorRule implements ValidatorRule<num> {
       this.max = double.infinity,
       this.onlyPositive = false,
       this.onlyNegative = false,
-      this.additionalValidators = const [],
-      this.treatNullAs});
+      additionalValidators = const [],
+      treatNullAs}) {
+    this.nullable = nullable;
+    this.treatNullAs = treatNullAs;
+    this.additionalValidators = additionalValidators;
+  }
 
-  bool nullable;
-  num treatNullAs; // Sanitizer
   bool allowStringValues; // Sanitizer
 
   bool integer;
@@ -30,18 +36,12 @@ class NumberValidatorRule implements ValidatorRule<num> {
   bool onlyPositive;
   bool onlyNegative;
 
-  List<bool Function(num)> additionalValidators;
-
   bool _valueIsNumber(dynamic value) => value is num;
 
   Type type = num;
 
   num validate(value) {
-    if (!nullable && value == null) {
-      throw ValidationException.nullException(type);
-    } else if (nullable && value == null) {
-      return treatNullAs;
-    }
+    validateNullable(value);
 
     if (!allowStringValues && !_valueIsNumber(value)) {
       throw ValidationException('Value is not a number', type.toString(),
@@ -92,12 +92,7 @@ class NumberValidatorRule implements ValidatorRule<num> {
           'Value is not negative or zero', "<=0", value.toString());
     }
 
-    if (additionalValidators.isNotEmpty &&
-        !additionalValidators.fold(
-            true, (foldValue, validator) => foldValue && validator(value))) {
-      throw ValidationException('Value did not pass custom validator', "",
-          value?.toString() ?? 'null');
-    }
+    validateAdditionalValidators(value);
 
     return value;
   }

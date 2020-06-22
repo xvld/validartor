@@ -1,5 +1,5 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/validation_exception.dart';
+import './base_rule.dart';
+import '../common/validation_exception.dart';
 
 class MultiValidatorRule implements ValidatorRule {
   MultiValidatorRule(this.rules);

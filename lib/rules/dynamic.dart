@@ -1,27 +1,21 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/validation_exception.dart';
+import './base_rule.dart';
+import '../common/null_validator.dart';
+import '../common/additional_validators.dart';
 
-class DynamicValidatorRule implements ValidatorRule<dynamic> {
-  DynamicValidatorRule(
-      {this.nullable = false, this.additionalValidators = const []});
-
-  bool nullable;
-  List<bool Function(dynamic)> additionalValidators;
+class DynamicValidatorRule
+    with NullValidator<dynamic>, AdditionalValidators
+    implements ValidatorRule<dynamic> {
+  DynamicValidatorRule({nullable = false, additionalValidators = const []}) {
+    this.nullable = nullable;
+    this.additionalValidators = additionalValidators;
+  }
 
   Type type = dynamic;
 
   dynamic validate(value) {
-    if (!nullable && value == null) {
-      throw ValidationException.nullException(type);
-    } else if (nullable && value == null) {
-      return value;
-    }
+    validateNullable(value);
 
-    if (additionalValidators.isNotEmpty &&
-        !additionalValidators.fold(
-            true, (foldValue, validator) => foldValue && validator(value))) {
-      throw ValidationException.customValidator();
-    }
+    validateAdditionalValidators(value);
 
     return value;
   }

@@ -38,8 +38,12 @@ class ValidationException implements Exception {
       ValidationException('Value is not as expected', expected, actual,
           type: ValidationExceptionType.notAsExpected);
 
-  factory ValidationException.customValidator() =>
-      ValidationException('Value did not pass custom validator', '', '',
+  factory ValidationException.customValidator(
+          {List<int> failedValidatorsIndices = const []}) =>
+      ValidationException(
+          'Value did not pass custom validator/s',
+          'All validators should pass',
+          'Validators ${failedValidatorsIndices.join(',')} did not pass',
           type: ValidationExceptionType.customValidator);
 }
 

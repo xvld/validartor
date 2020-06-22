@@ -1,5 +1,5 @@
-import 'package:validartor/common/enums.dart';
-import 'package:validartor/validation_exception.dart';
+import './enums.dart';
+import '../common/validation_exception.dart';
 
 mixin MultiExceptionHandler {
   ThrowBehaviour throwBehaviour = ThrowBehaviour.multi;

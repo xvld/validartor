@@ -1,13 +1,17 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/validation_exception.dart';
+import './base_rule.dart';
+import '../common/additional_validators.dart';
+import '../common/null_validator.dart';
+import '../common/validation_exception.dart';
 
 enum InputTrimType { left, right, both, all, none }
 enum InputType { alphabetic, numeric, alphaNumeric, lowerCase, upperCase }
 
-class StringValidatorRule implements ValidatorRule<String> {
+class StringValidatorRule
+    with NullValidator<String>, AdditionalValidators
+    implements ValidatorRule<String> {
   StringValidatorRule(
-      {this.nullable = false,
-      this.treatNullAs = null,
+      {nullable = false,
+      treatNullAs = null,
       this.acceptEmpty = true,
       this.inputTrim = InputTrimType.none,
       this.length = double.infinity,
@@ -17,10 +21,11 @@ class StringValidatorRule implements ValidatorRule<String> {
       this.mustContain,
       this.inputTypes = const [],
       this.ignoredCharsInInputTypeChecks = const [],
-      this.allowedValues = const []});
+      this.allowedValues = const []}) {
+    this.nullable = nullable;
+    this.treatNullAs = treatNullAs;
+  }
 
-  bool nullable;
-  String treatNullAs; // Sanitizer
   bool acceptEmpty;
   InputTrimType inputTrim; // Sanitizer
 
@@ -101,6 +106,8 @@ class StringValidatorRule implements ValidatorRule<String> {
     }
 
     if (inputTypes.isNotEmpty) {}
+
+    validateAdditionalValidators(value);
 
     return value;
   }

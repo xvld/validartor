@@ -1,26 +1,34 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/common/enums.dart';
-import 'package:validartor/common/multi_exception_handler.dart';
-
-import '../validation_exception.dart';
+import './base_rule.dart';
+import '../common/additional_validators.dart';
+import '../common/enums.dart';
+import '../common/multi_exception_handler.dart';
+import '../common/null_validator.dart';
+import '../common/validation_exception.dart';
 
 class BasicMapValidatorRule
-    with MultiExceptionHandler
+    with
+        MultiExceptionHandler,
+        NullValidator<Map<String, dynamic>>,
+        AdditionalValidators
     implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
       {this.expectedFieldsMap = null,
-      this.nullable = false,
+      nullable = false,
+      treatNullAsEmptyMap = false,
+      additionalValidators = const [],
       this.extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
       this.blacklistedKeys = const [],
       this.allowedKeys = const [],
       this.minNumOfKeys = 0,
       this.maxNumOfKeys = double.infinity,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
-    throwBehaviour = throwBehaviour;
+    this.nullable = nullable;
+    this.treatNullAs = treatNullAsEmptyMap ? {} : null;
+    this.throwBehaviour = throwBehaviour;
+    this.additionalValidators = additionalValidators;
   }
 
   Map<String, dynamic> expectedFieldsMap;
-  bool nullable;
   MapExtraFieldsBehaviour extraFieldsBehaviour; // Sanitizer
 
   List<String> allowedKeys;
@@ -34,11 +42,10 @@ class BasicMapValidatorRule
     MultiValidationException multiValidationException =
         MultiValidationException('Map validation failed', []);
 
-    if (!nullable && value == null) {
-      throw handleException(
-          multiValidationException, ValidationException.nullException(type));
-    } else if (nullable && value == null) {
-      return value;
+    try {
+      validateNullable(value);
+    } on ValidationException catch (e) {
+      throw handleException(multiValidationException, e);
     }
 
     if (!(value is Map)) {
@@ -143,6 +150,12 @@ class BasicMapValidatorRule
         checkBlacklistForKey(key);
       }
     });
+
+    try {
+      validateAdditionalValidators(value);
+    } on ValidationException catch (e) {
+      handleException(multiValidationException, e);
+    }
 
     if (multiValidationException.exceptions.isNotEmpty) {
       throw multiValidationException;

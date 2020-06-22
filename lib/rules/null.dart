@@ -1,5 +1,5 @@
-import 'package:validartor/base_rule.dart';
-import 'package:validartor/validation_exception.dart';
+import './base_rule.dart';
+import '../common/validation_exception.dart';
 
 class NullValidatorRule implements ValidatorRule<Null> {
   NullValidatorRule();
@@ -8,8 +8,7 @@ class NullValidatorRule implements ValidatorRule<Null> {
 
   Null validate(value) {
     if (value != null) {
-      throw ValidationException(
-          'Value is not null', 'null', value?.runtimeType);
+      throw ValidationException.invalidType(null, value?.runtimeType);
     }
 
     return null;

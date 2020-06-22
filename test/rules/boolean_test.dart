@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:validartor/rules/boolean.dart';
-import 'package:validartor/validation_exception.dart';
+import 'package:validartor/common/validation_exception.dart';
 
 void main() {
   test('Should validate non nullable boolean value correctly', () {

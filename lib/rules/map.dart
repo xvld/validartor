@@ -43,7 +43,9 @@ class BasicMapValidatorRule
         MultiValidationException('Map validation failed', []);
 
     try {
-      validateNullable(value);
+      if (validateNullable(value)) {
+        return treatNullAs;
+      }
     } on ValidationException catch (e) {
       throw handleException(multiValidationException, e);
     }

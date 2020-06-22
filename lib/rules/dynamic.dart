@@ -13,7 +13,9 @@ class DynamicValidatorRule
   Type type = dynamic;
 
   dynamic validate(value) {
-    validateNullable(value);
+    if (validateNullable(value)) {
+      return treatNullAs;
+    }
 
     validateAdditionalValidators(value);
 

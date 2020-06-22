@@ -6,8 +6,8 @@ class BooleanValidatorRule
     with NullValidator<bool>
     implements ValidatorRule<bool> {
   BooleanValidatorRule(
-      {nullable = false,
-      treatNullAsFalse = false,
+      {bool nullable = false,
+      bool treatNullAsFalse = false,
       this.allowTruthyFalsyValues = false,
       this.expected,
       this.truthyValues = defaultTruthyValues,
@@ -27,7 +27,9 @@ class BooleanValidatorRule
   final Type type = bool;
 
   bool validate(dynamic value) {
-    validateNullable(value);
+    if (validateNullable(value)) {
+      return treatNullAs;
+    }
 
     if (!allowTruthyFalsyValues && !(value is bool)) {
       throw ValidationException.invalidType(type, value.runtimeType);

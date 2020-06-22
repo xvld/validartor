@@ -53,7 +53,9 @@ class ListValidatorRule<T extends dynamic>
         MultiValidationException('List validation failed', []);
 
     try {
-      validateNullable(value);
+      if (validateNullable(value)) {
+        return treatNullAs;
+      }
     } on ValidationException catch (e) {
       throw handleException(multiValidationException, e);
     }

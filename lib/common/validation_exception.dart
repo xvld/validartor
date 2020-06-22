@@ -8,25 +8,38 @@ enum ValidationExceptionType {
   customValidator,
 }
 
+/// An exception signalling that a validation has failed
+///
+/// Will be thrown from the [validate] method of [ValidatorRule]
 class ValidationException implements Exception {
   ValidationException(this.message, this.expected, this.actual,
       {this.type = ValidationExceptionType.general});
 
+  /// The exception message
   final dynamic message;
+
+  /// The exception type
   final ValidationExceptionType type;
+
+  /// The value the validator expected to receive
   final String expected;
+
+  /// The actual value it gor
   final String actual;
 
+  /// Shorthand for a null exception
   factory ValidationException.nullException(Type expected) =>
       ValidationException(
           'Value must not be null', expected?.toString(), 'null',
           type: ValidationExceptionType.isNull);
 
+  /// Shorthand for when the types mismatch
   factory ValidationException.invalidType(Type expected, Type actual) =>
       ValidationException('Value is not ${expected?.toString()}',
           expected?.toString(), actual?.toString() ?? 'null',
           type: ValidationExceptionType.invalidType);
 
+  /// Shorthand for when the types cannot be converted
   factory ValidationException.cannotConvert(String expected, Type actual) =>
       ValidationException(
           'Cannot convert from ${actual?.toString() ?? 'null'} to $expected',
@@ -34,10 +47,14 @@ class ValidationException implements Exception {
           actual?.toString() ?? 'null',
           type: ValidationExceptionType.cannotConvert);
 
+  /// Shorthand for when the value itself is not as expected in the validator
   factory ValidationException.notAsExpected(String expected, String actual) =>
       ValidationException('Value is not as expected', expected, actual,
           type: ValidationExceptionType.notAsExpected);
 
+  /// Shorthand for when an additional validator fails
+  ///
+  /// [failedValidatorsIndices] is a list of the indices of the additionalValidators that failed
   factory ValidationException.customValidator(
           {List<int> failedValidatorsIndices = const []}) =>
       ValidationException(
@@ -47,6 +64,9 @@ class ValidationException implements Exception {
           type: ValidationExceptionType.customValidator);
 }
 
+/// An exception signalling that a validation has failed, with multiple errors
+///
+/// Will be thrown from the [validate] method of [ValidatorRule] when [ThrowBehaviour] is multi
 class MultiValidationException implements Exception {
   MultiValidationException(this.message, this.exceptions);
 

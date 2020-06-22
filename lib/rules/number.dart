@@ -41,7 +41,9 @@ class NumberValidatorRule
   Type type = num;
 
   num validate(value) {
-    validateNullable(value);
+    if (validateNullable(value)) {
+      return treatNullAs;
+    }
 
     if (!allowStringValues && !_valueIsNumber(value)) {
       throw ValidationException('Value is not a number', type.toString(),

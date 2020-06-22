@@ -12,7 +12,7 @@ mixin AdditionalValidators {
   /// If any error should occur in a custom validator, it will count as a failure
   /// Throws a [ValidationException] if any of the validators fail
   validateAdditionalValidators(dynamic value) {
-    List<num> failedValidators = [];
+    List<int> failedValidators = [];
 
     if (additionalValidators.isNotEmpty &&
         !additionalValidators.fold(true, (foldValue, validator) {

@@ -57,7 +57,7 @@ class BooleanValidatorRule
       if (notOneTruthyValuePassed && notOneFalsyValuePassed) {
         throw ValidationException.cannotConvert(
             (<dynamic>[]..addAll(truthyValues)..addAll(falsyValues)).join('|'),
-            value);
+            value.runtimeType);
       }
     }
 

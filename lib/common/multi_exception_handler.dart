@@ -11,7 +11,8 @@ mixin MultiExceptionHandler {
   MultiValidationException multiValidationException;
 
   void initExceptionHandler(String message) {
-    multiValidationException = MultiValidationException(message);
+    multiValidationException =
+        MultiValidationException(message, exceptions: []);
   }
 
   /// Handles an exception

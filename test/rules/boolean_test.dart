@@ -2,13 +2,15 @@ import 'package:test/test.dart';
 import 'package:validartor/rules/boolean.dart';
 import 'package:validartor/common/validation_exception.dart';
 
+import '../test_utils.dart';
+
 void main() {
   test('Should validate non nullable boolean value correctly', () {
     final validator = BooleanValidatorRule();
 
     expect(validator.validate(true), true);
     expect(validator.validate(false), false);
-    expect(() => validator.validate(null), throwsA(isA<ValidationException>()));
+    expectValidationException(validator, null, ValidationExceptionType.isNull);
   });
 
   test('Should validate nullable boolean value correctly', () {
@@ -33,7 +35,8 @@ void main() {
     expect(validator.validate('false'), false);
     expect(validator.validate(1), true);
     expect(validator.validate(0), false);
-    expect(() => validator.validate('a'), throwsA(isA<ValidationException>()));
+    expectValidationException(
+        validator, 'a', ValidationExceptionType.cannotConvert);
   });
 
   test('Should validate overriden values correctly', () {
@@ -44,18 +47,18 @@ void main() {
 
     expect(validator.validate('yes'), true);
     expect(validator.validate('no'), false);
-    expect(
-        () => validator.validate('true'), throwsA(isA<ValidationException>()));
-    expect(
-        () => validator.validate('false'), throwsA(isA<ValidationException>()));
+    expectValidationException(
+        validator, 'true', ValidationExceptionType.cannotConvert);
+    expectValidationException(
+        validator, 0, ValidationExceptionType.cannotConvert);
   });
 
   test('Should validate expected boolean value correctly', () {
     final validator = BooleanValidatorRule(expected: true);
 
     expect(validator.validate(true), true);
-    expect(
-        () => validator.validate(false), throwsA(isA<ValidationException>()));
+    expectValidationException(
+        validator, false, ValidationExceptionType.notAsExpected);
   });
 
   test('Should validate truthy expected boolean value correctly', () {
@@ -63,7 +66,7 @@ void main() {
         BooleanValidatorRule(expected: true, allowTruthyFalsyValues: true);
 
     expect(validator.validate('true'), true);
-    expect(
-        () => validator.validate('false'), throwsA(isA<ValidationException>()));
+    expectValidationException(
+        validator, 'false', ValidationExceptionType.notAsExpected);
   });
 }

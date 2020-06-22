@@ -16,9 +16,9 @@ class BasicMapValidatorRule
     implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
       {this.expectedFieldsMap = null,
-      nullable = false,
-      treatNullAsEmptyMap = false,
-      additionalValidators = const [],
+      bool nullable = false,
+      bool treatNullAsEmptyMap = false,
+      List<bool Function(dynamic)> additionalValidators = const [],
       this.extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
       this.blacklistedKeys = const [],
       this.allowedKeys = const [],

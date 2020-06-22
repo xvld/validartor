@@ -1,3 +1,5 @@
+import 'package:validartor/common/min_max_validator.dart';
+
 import './base_rule.dart';
 import '../common/additional_validators.dart';
 import '../common/null_validator.dart';
@@ -7,7 +9,7 @@ enum InputTrimType { left, right, both, all, none }
 enum InputType { alphabetic, numeric, alphaNumeric, lowerCase, upperCase }
 
 class StringValidatorRule
-    with NullValidator<String>, AdditionalValidators
+    with NullValidator<String>, AdditionalValidators, MinMaxValidator
     implements ValidatorRule<String> {
   StringValidatorRule(
       {nullable = false,
@@ -21,9 +23,11 @@ class StringValidatorRule
       this.mustContain,
       this.inputTypes = const [],
       this.ignoredCharsInInputTypeChecks = const [],
-      this.allowedValues = const []}) {
+      this.allowedValues = const [],
+      List<bool Function(dynamic)> additionalValidators}) {
     this.nullable = nullable;
     this.treatNullAs = treatNullAs;
+    this.additionalValidators = additionalValidators;
   }
 
   bool acceptEmpty;
@@ -90,20 +94,8 @@ class StringValidatorRule
           'Value is empty', '""', value?.runtimeType ?? 'null');
     }
 
-    if (length != null && stringValue.length != length) {
-      throw ValidationException('String length does not match',
-          length.toString(), stringValue.length.toString());
-    }
-
-    if (stringValue.length < minLength) {
-      throw ValidationException('String length does not match', '>= $minLength',
-          stringValue.length.toString());
-    }
-
-    if (maxLength != null && stringValue.length > maxLength) {
-      throw ValidationException('String length does not match', '<= $maxLength',
-          stringValue.length.toString());
-    }
+    validateMinMaxExact(stringValue.length, minLength, maxLength, length,
+        checkedValueName: 'String length');
 
     if (inputTypes.isNotEmpty) {}
 

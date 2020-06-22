@@ -5,7 +5,9 @@ import '../common/additional_validators.dart';
 class DynamicValidatorRule
     with NullValidator<dynamic>, AdditionalValidators
     implements ValidatorRule<dynamic> {
-  DynamicValidatorRule({nullable = false, additionalValidators = const []}) {
+  DynamicValidatorRule(
+      {bool nullable = false,
+      List<bool Function(dynamic)> additionalValidators = const []}) {
     this.nullable = nullable;
     this.additionalValidators = additionalValidators;
   }

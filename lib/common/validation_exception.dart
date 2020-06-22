@@ -68,7 +68,7 @@ class ValidationException implements Exception {
 ///
 /// Will be thrown from the [validate] method of [ValidatorRule] when [ThrowBehaviour] is multi
 class MultiValidationException implements Exception {
-  MultiValidationException(this.message, this.exceptions);
+  MultiValidationException(this.message, {this.exceptions = const []});
 
   final ValidationExceptionType type = ValidationExceptionType.multi;
   final dynamic message;

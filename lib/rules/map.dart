@@ -1,3 +1,5 @@
+import 'package:validartor/common/min_max_validator.dart';
+
 import './base_rule.dart';
 import '../common/additional_validators.dart';
 import '../common/enums.dart';
@@ -9,7 +11,8 @@ class BasicMapValidatorRule
     with
         MultiExceptionHandler,
         NullValidator<Map<String, dynamic>>,
-        AdditionalValidators
+        AdditionalValidators,
+        MinMaxValidator
     implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
       {this.expectedFieldsMap = null,
@@ -39,58 +42,44 @@ class BasicMapValidatorRule
   Type type = Map;
 
   Map<String, dynamic> validate(value) {
-    MultiValidationException multiValidationException =
-        MultiValidationException('Map validation failed', []);
+    initExceptionHandler('Map validation failed');
 
     try {
       if (validateNullable(value)) {
         return treatNullAs;
       }
     } on ValidationException catch (e) {
-      throw handleException(multiValidationException, e);
+      throw handleException(e);
     }
 
     if (!(value is Map)) {
-      throw handleException(
-          multiValidationException,
-          ValidationException('Value is not a Map', type.toString(),
-              value?.runtimeType?.toString() ?? 'null'));
+      throw handleException(ValidationException('Value is not a Map',
+          type.toString(), value?.runtimeType?.toString() ?? 'null'));
     }
 
     final valueMap = Map.from(value).cast<String, dynamic>();
     final valueKeys = valueMap.keys;
     List<String> keysToRemove = [];
 
-    if (valueKeys.length > maxNumOfKeys) {
-      handleException(
-          multiValidationException,
-          ValidationException('Map keys exceed maxNumOfKeys',
-              '<= $maxNumOfKeys', valueKeys.length.toString()));
-    }
-
-    if (valueKeys.length < minNumOfKeys) {
-      handleException(
-          multiValidationException,
-          ValidationException('Map keys below minNumOfKeys', '>= $minNumOfKeys',
-              valueKeys.length.toString()));
+    try {
+      validateMinMaxExact(valueKeys.length, minNumOfKeys, maxNumOfKeys, null,
+          checkedValueName: 'Map keys');
+    } on ValidationException catch (e) {
+      handleException(e);
     }
 
     final checkBlacklistForKey = (String key) {
       if (blacklistedKeys.contains(key)) {
-        return handleException(
-            multiValidationException,
-            ValidationException('Map contains blacklisted key/s',
-                'Not in ${blacklistedKeys.join(',')}', value.toString()));
+        handleException(ValidationException('Map contains blacklisted key/s',
+            'Not in ${blacklistedKeys.join(',')}', value.toString()));
       }
     };
 
     final checkExtraFieldsBehaviour = (String key) {
       switch (extraFieldsBehaviour) {
         case MapExtraFieldsBehaviour.error:
-          handleException(
-              multiValidationException,
-              ValidationException('Map contains key $key',
-                  'To not contain $key', value.toString()));
+          handleException(ValidationException('Map contains key $key',
+              'To not contain $key', value.toString()));
           break;
         case MapExtraFieldsBehaviour.remove:
           keysToRemove.add(key);
@@ -109,12 +98,10 @@ class BasicMapValidatorRule
 
         if (expectedKeysMissing.isNotEmpty) {
           expectedKeysMissing.forEach((expectedKeyMissing) {
-            handleException(
-                multiValidationException,
-                ValidationException(
-                    'Value is missing a key $expectedKeyMissing',
-                    expectedKeyMissing,
-                    expectedKeyMissing?.toString()));
+            handleException(ValidationException(
+                'Value is missing a key $expectedKeyMissing',
+                expectedKeyMissing,
+                expectedKeyMissing?.toString()));
           });
         }
 
@@ -122,10 +109,10 @@ class BasicMapValidatorRule
 
         if (expectedFieldsMap.containsKey(key) &&
             expectedFieldsMap[key] != mapValue) {
-          handleException(
-              multiValidationException,
-              ValidationException('Value at $key is not as expected',
-                  expectedFieldsMap[key], mapValue?.toString()));
+          handleException(ValidationException(
+              'Value at $key is not as expected',
+              expectedFieldsMap[key],
+              mapValue?.toString()));
         } else if (expectedFieldsMap.containsKey(key) &&
             expectedFieldsMap[key] == mapValue) {
           keyFound = true;
@@ -156,12 +143,10 @@ class BasicMapValidatorRule
     try {
       validateAdditionalValidators(value);
     } on ValidationException catch (e) {
-      handleException(multiValidationException, e);
+      handleException(e);
     }
 
-    if (multiValidationException.exceptions.isNotEmpty) {
-      throw multiValidationException;
-    }
+    throwMultiValidationExceptionIfExists();
 
     keysToRemove.forEach(valueMap.remove);
     return valueMap;
@@ -198,14 +183,9 @@ class MapValidatorRule extends BasicMapValidatorRule
 
   @override
   Map<String, dynamic> validate(value) {
-    MultiValidationException multiValidationException =
-        MultiValidationException('Map validation failed', []);
-
     try {
       super.validate(value);
-    } on MultiValidationException catch (exception) {
-      multiValidationException.exceptions = exception.exceptions;
-    }
+    } on MultiValidationException catch (_) {}
 
     if (!(value is Map<String, ValidatorRule>)) {
       // return false;
@@ -218,6 +198,8 @@ class MapValidatorRule extends BasicMapValidatorRule
     validationMap.forEach((key, validator) {
       validator.validate(value[key]);
     });
+
+    throwMultiValidationExceptionIfExists();
 
     return value;
   }

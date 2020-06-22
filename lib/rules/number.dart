@@ -1,13 +1,14 @@
+import '../common/min_max_validator.dart';
 import '../common/additional_validators.dart';
 import '../common/null_validator.dart';
 import './base_rule.dart';
 import '../common/validation_exception.dart';
 
 class NumberValidatorRule
-    with NullValidator<num>, AdditionalValidators
+    with NullValidator<num>, AdditionalValidators, MinMaxValidator
     implements ValidatorRule<num> {
   NumberValidatorRule(
-      {nullable = false,
+      {bool nullable = false,
       this.allowStringValues = false,
       this.integer = false,
       this.expected,
@@ -16,8 +17,8 @@ class NumberValidatorRule
       this.max = double.infinity,
       this.onlyPositive = false,
       this.onlyNegative = false,
-      additionalValidators = const [],
-      treatNullAs}) {
+      List<bool Function(dynamic)> additionalValidators = const [],
+      num treatNullAs}) {
     this.nullable = nullable;
     this.treatNullAs = treatNullAs;
     this.additionalValidators = additionalValidators;
@@ -59,10 +60,7 @@ class NumberValidatorRule
       }
     }
 
-    if (expected != null && expected != value) {
-      throw ValidationException(
-          'Value is not as expected', expected.toString(), value.toString());
-    }
+    validateMinMaxExact(value, min, max, expected);
 
     if (notEqualTo != null && notEqualTo == value) {
       throw ValidationException('Value is not as expected',
@@ -72,16 +70,6 @@ class NumberValidatorRule
     if (integer && value % 1 != 0) {
       throw ValidationException(
           'Value is not an integer', 'int', value.toString());
-    }
-
-    if (value < min) {
-      throw ValidationException(
-          'Value is lower than min', ">=${min.toString()}", value.toString());
-    }
-
-    if (value > max) {
-      throw ValidationException(
-          'Value is higher than max', "<=${max.toString()}", value.toString());
     }
 
     if (onlyPositive != null && value < 0) {

@@ -1,8 +1,14 @@
+import 'package:validartor/common/enums.dart';
+import 'package:validartor/common/multi_exception_handler.dart';
+
 import './base_rule.dart';
 import '../common/validation_exception.dart';
 
-class MultiValidatorRule implements ValidatorRule {
-  MultiValidatorRule(this.rules);
+class MultiValidatorRule with MultiExceptionHandler implements ValidatorRule {
+  MultiValidatorRule(this.rules,
+      {ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
+    this.throwBehaviour = throwBehaviour;
+  }
 
   List<ValidatorRule> rules;
 
@@ -10,20 +16,24 @@ class MultiValidatorRule implements ValidatorRule {
 
   dynamic validate(value) {
     dynamic pass;
-    List<ValidationException> exceptions = [];
+    initExceptionHandler('Multi validator failed');
+
+    if (rules == null || rules.isEmpty) {
+      throw handleException(ValidationException('No validators',
+          rules.map((rule) => rule?.runtimeType).join(','), value));
+    }
 
     for (ValidatorRule rule in rules) {
       try {
         pass = rule.validate(value);
         break;
       } on ValidationException catch (e) {
-        exceptions.add(e);
+        handleException(e);
       }
     }
 
-    if (exceptions.isNotEmpty && pass == null) {
-      throw MultiValidationException(
-          'Value did not match any of the rules given', exceptions);
+    if (pass == null) {
+      throwMultiValidationExceptionIfExists();
     }
 
     return pass;

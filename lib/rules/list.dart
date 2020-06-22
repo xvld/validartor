@@ -1,3 +1,5 @@
+import 'package:validartor/common/min_max_validator.dart';
+
 import './base_rule.dart';
 import '../common/null_validator.dart';
 import '../common/multi_exception_handler.dart';
@@ -6,11 +8,15 @@ import '../common/enums.dart';
 import '../common/validation_exception.dart';
 
 class ListValidatorRule<T extends dynamic>
-    with MultiExceptionHandler, NullValidator<List<T>>, AdditionalValidators
+    with
+        MultiExceptionHandler,
+        NullValidator<List<T>>,
+        AdditionalValidators,
+        MinMaxValidator
     implements ValidatorRule<List<T>> {
   ListValidatorRule(
-      {nullable = false,
-      treatNullAsEmptyList = false,
+      {bool nullable = false,
+      bool treatNullAsEmptyList = false,
       this.allowEmpty = true,
       this.minLength = 0,
       this.maxLength = double.infinity,
@@ -21,7 +27,7 @@ class ListValidatorRule<T extends dynamic>
       this.expectedValues,
       this.ordered,
       this.mustContainAllValues,
-      additionalValidators = const [],
+      List<bool Function(dynamic)> additionalValidators = const [],
       this.elementRule = null,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
     this.nullable = nullable;
@@ -49,76 +55,49 @@ class ListValidatorRule<T extends dynamic>
   Type type = List;
 
   List<T> validate(value) {
-    MultiValidationException multiValidationException =
-        MultiValidationException('List validation failed', []);
+    initExceptionHandler('List validation failed');
 
     try {
       if (validateNullable(value)) {
         return treatNullAs;
       }
     } on ValidationException catch (e) {
-      throw handleException(multiValidationException, e);
+      throw handleException(e);
     }
 
     if (!(value is List)) {
-      throw handleException(
-          multiValidationException,
-          ValidationException('Value is not a Map', type.toString(),
-              value?.runtimeType ?? 'null'));
+      throw handleException(ValidationException(
+          'Value is not a Map', type.toString(), value?.runtimeType ?? 'null'));
     }
 
     final list = value as List<T>;
 
     if (!allowEmpty && list.isEmpty) {
-      throw handleException(
-          multiValidationException,
-          ValidationException('List cannot be empty', 'list.length > 0',
-              list.length.toString()));
+      throw handleException(ValidationException(
+          'List cannot be empty', 'list.length > 0', list.length.toString()));
     }
 
-    if (length != null && list.length != length) {
-      handleException(
-          multiValidationException,
-          ValidationException('List length does not match expected length',
-              'list.length == $length', list.length.toString()));
-    }
-
-    if (list.length < minLength) {
-      handleException(
-          multiValidationException,
-          ValidationException('List length is below minLength', '>= $minLength',
-              list.length.toString()));
-    }
-
-    if (maxLength != null && list.length > maxLength) {
-      handleException(
-          multiValidationException,
-          ValidationException('List length exceeds maxLength', '<= $maxLength',
-              list.length.toString()));
-    }
+    validateMinMaxExact(list.length, minLength, maxLength, length,
+        checkedValueName: 'List length');
 
     if (mustContain != null && list.indexOf(mustContain) == -1) {
-      handleException(
-          multiValidationException,
-          ValidationException('List does not contain expected value',
-              '$mustContain', list.join(',')));
+      handleException(ValidationException(
+          'List does not contain expected value',
+          '$mustContain',
+          list.join(',')));
     }
 
     if (mustContainPredicate != null &&
         list.firstWhere(mustContainPredicate, orElse: () => null) == null) {
-      handleException(
-          multiValidationException,
-          ValidationException(
-              'List does not contain expected value with predicate',
-              'predicate given',
-              list.join(',')));
+      handleException(ValidationException(
+          'List does not contain expected value with predicate',
+          'predicate given',
+          list.join(',')));
     }
 
     if (unique && Set.from(list).length != list.length) {
-      handleException(
-          multiValidationException,
-          ValidationException('List contains non-unique values',
-              Set.from(list).join(','), list.join(',')));
+      handleException(ValidationException('List contains non-unique values',
+          Set.from(list).join(','), list.join(',')));
     }
 
     if (expectedValues != null) {
@@ -148,13 +127,10 @@ class ListValidatorRule<T extends dynamic>
     try {
       validateAdditionalValidators(value);
     } on ValidationException catch (e) {
-      handleException(multiValidationException, e);
+      handleException(e);
     }
 
-    if (multiValidationException.exceptions.isNotEmpty) {
-      throw multiValidationException;
-    }
-
+    throwMultiValidationExceptionIfExists();
     return list;
   }
 }

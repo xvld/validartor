@@ -8,19 +8,29 @@ import '../common/validation_exception.dart';
 mixin MultiExceptionHandler {
   /// The desired throw behaviour of the [handleException] function
   ThrowBehaviour throwBehaviour = ThrowBehaviour.multi;
+  MultiValidationException multiValidationException;
+
+  void initExceptionHandler(String message) {
+    multiValidationException = MultiValidationException(message);
+  }
 
   /// Handles an exception
   ///
   /// Returns the [MultiValidationException] with the exception added
   /// Throws [ValidationException] if [throwBehaviour] is [ThrowBehaviour.first]
-  MultiValidationException handleException(
-      MultiValidationException multiValidationException,
-      ValidationException exception) {
+  MultiValidationException handleException(ValidationException exception) {
     if (throwBehaviour == ThrowBehaviour.first) {
       throw exception;
     }
 
     multiValidationException.exceptions.add(exception);
     return multiValidationException;
+  }
+
+  throwMultiValidationExceptionIfExists() {
+    if (multiValidationException != null &&
+        multiValidationException.exceptions.isNotEmpty) {
+      throw multiValidationException;
+    }
   }
 }

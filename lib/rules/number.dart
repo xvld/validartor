@@ -47,39 +47,38 @@ class NumberValidatorRule
     }
 
     if (!allowStringValues && !_valueIsNumber(value)) {
-      throw ValidationException('Value is not a number', type.toString(),
-          value?.runtimeType ?? 'null');
+      throw ValidationException.invalidType(type, value?.runtimeType);
     } else if (allowStringValues && value is String) {
       try {
         value = num.parse(value); // set to double to continue
       } catch (_) {
-        throw ValidationException(
-            'Value is a string that isnt parsable to a number',
-            expected.toString(),
-            value.toString());
+        throw ValidationException.cannotConvert(expected.toString(), type);
       }
     }
 
     validateMinMaxExact(value, min, max, expected);
 
     if (notEqualTo != null && notEqualTo == value) {
-      throw ValidationException('Value is not as expected',
+      throw ValidationException.notAsExpected(
           "!=${notEqualTo.toString()}", value.toString());
     }
 
     if (integer && value % 1 != 0) {
       throw ValidationException(
-          'Value is not an integer', 'int', value.toString());
+          'Value is not an integer', 'int', value.toString(),
+          type: ValidationExceptionType.invalidType);
     }
 
     if (onlyPositive != null && value < 0) {
       throw ValidationException(
-          'Value is not positive or zero', ">=0", value.toString());
+          'Value is not positive or zero', ">=0", value.toString(),
+          type: ValidationExceptionType.notAsExpected);
     }
 
     if (onlyNegative != null && value > 0) {
       throw ValidationException(
-          'Value is not negative or zero', "<=0", value.toString());
+          'Value is not negative or zero', "<=0", value.toString(),
+          type: ValidationExceptionType.notAsExpected);
     }
 
     validateAdditionalValidators(value);

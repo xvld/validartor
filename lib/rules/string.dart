@@ -64,8 +64,7 @@ class StringValidatorRule
     }
 
     if (!(value is String)) {
-      throw ValidationException('Value is not a string', type.toString(),
-          value?.runtimeType ?? 'null');
+      throw ValidationException.invalidType(type, value.runtimeType;
     }
 
     String stringValue = value;

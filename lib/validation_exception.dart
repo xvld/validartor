@@ -1,5 +1,6 @@
 enum ValidationExceptionType {
   general,
+  multi,
   isNull,
   invalidType,
   cannotConvert,
@@ -45,6 +46,7 @@ class ValidationException implements Exception {
 class MultiValidationException implements Exception {
   MultiValidationException(this.message, this.exceptions);
 
+  final ValidationExceptionType type = ValidationExceptionType.multi;
   final dynamic message;
   List<ValidationException> exceptions;
 }

@@ -64,7 +64,7 @@ class StringValidatorRule
     }
 
     if (!(value is String)) {
-      throw ValidationException.invalidType(type, value.runtimeType;
+      throw ValidationException.invalidType(type, value.runtimeType);
     }
 
     String stringValue = value;

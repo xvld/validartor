@@ -1,0 +1,18 @@
+name: validartor_example
+description: A custom and extendable input validator library in dart.
+version: 0.0.1
+author: vladi.r95@gmail.com
+homepage: https://github.com/xvld/validartor
+repository: https://github.com/xvld/validartor
+issue_tracker: https://github.com/xvld/validartor/issues
+documentation: https://github.com/xvld/validartor/blob/master/README.md
+
+environment:
+  sdk: '>=2.1.0 <3.0.0'
+
+dependencies:
+  http: ^0.12.1
+
+dev_dependencies:
+  test: ^1.14.5
+  pedantic: ^1.0.0

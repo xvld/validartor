@@ -1,4 +1,4 @@
-import 'package:validartor/common/validation_exception.dart';
+import '../common/validation_exception.dart';
 
 mixin MinMaxExactValidation {
   void validateMinMaxExact(num value, num min, num max, num expected,

@@ -1,4 +1,4 @@
-import './enums.dart';
+import '../common/enums.dart';
 import '../common/validation_exception.dart';
 
 /// Allows handling exceptions and deciding whether to throw [MultiValidationException] or [ValidationException]

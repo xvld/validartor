@@ -1,6 +1,6 @@
 import './base_rule.dart';
-import '../common/null_validator.dart';
-import '../common/additional_validators.dart';
+import '../mixins/null_validator.dart';
+import '../mixins/additional_validators.dart';
 
 class DynamicValidatorRule
     with NullableValidation<dynamic>, AdditionalValidators

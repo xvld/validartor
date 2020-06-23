@@ -1,5 +1,5 @@
-import 'package:validartor/common/enums.dart';
-import 'package:validartor/common/multi_exception_handler.dart';
+import '../common/enums.dart';
+import '../mixins/multi_exception_handler.dart';
 
 import './base_rule.dart';
 import '../common/validation_exception.dart';

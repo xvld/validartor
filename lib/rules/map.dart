@@ -1,10 +1,10 @@
-import 'package:validartor/common/min_max_validator.dart';
+import '../mixins/min_max_validator.dart';
 
 import './base_rule.dart';
-import '../common/additional_validators.dart';
+import '../mixins/additional_validators.dart';
 import '../common/enums.dart';
-import '../common/multi_exception_handler.dart';
-import '../common/null_validator.dart';
+import '../mixins/multi_exception_handler.dart';
+import '../mixins/null_validator.dart';
 import '../common/validation_exception.dart';
 
 class BasicMapValidatorRule

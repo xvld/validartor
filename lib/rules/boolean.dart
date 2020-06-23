@@ -1,5 +1,5 @@
 import './base_rule.dart';
-import '../common/null_validator.dart';
+import '../mixins/null_validator.dart';
 import '../common/validation_exception.dart';
 
 class BooleanValidatorRule

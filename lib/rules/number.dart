@@ -37,8 +37,6 @@ class NumberValidatorRule
   bool onlyPositive;
   bool onlyNegative;
 
-  bool _valueIsNumber(dynamic value) => value is num;
-
   @override
   Type type = num;
 
@@ -50,7 +48,7 @@ class NumberValidatorRule
 
     num convertedValue;
 
-    if (!allowStringValues && !_valueIsNumber(value)) {
+    if (!allowStringValues && !(value is num)) {
       throw ValidationException.invalidType(type, value?.runtimeType as Type);
     } else if (allowStringValues && value is String) {
       try {

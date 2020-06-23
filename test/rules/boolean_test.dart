@@ -42,8 +42,8 @@ void main() {
   test('Should validate overriden values correctly', () {
     final validator = BooleanValidatorRule(
         allowTruthyFalsyValues: true,
-        truthyValues: ['yes'],
-        falsyValues: ['no']);
+        truthyValues: <dynamic>['yes'],
+        falsyValues: <dynamic>['no']);
 
     expect(validator.validate('yes'), true);
     expect(validator.validate('no'), false);

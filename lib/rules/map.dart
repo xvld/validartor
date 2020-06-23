@@ -15,7 +15,7 @@ class BasicMapValidatorRule
         MinMaxExactValidation
     implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
-      {this.expectedFieldsMap = null,
+      {this.expectedFieldsMap,
       bool nullable = false,
       bool treatNullAsEmptyMap = false,
       List<bool Function(dynamic)> additionalValidators = const [],
@@ -26,9 +26,10 @@ class BasicMapValidatorRule
       this.maxNumOfKeys = double.infinity,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
     this.nullable = nullable;
-    this.treatNullAs = treatNullAsEmptyMap ? {} : null;
     this.throwBehaviour = throwBehaviour;
     this.additionalValidators = additionalValidators;
+
+    treatNullAs = treatNullAsEmptyMap ? <String, dynamic>{} : null;
   }
 
   Map<String, dynamic> expectedFieldsMap;
@@ -39,9 +40,11 @@ class BasicMapValidatorRule
   num minNumOfKeys;
   num maxNumOfKeys;
 
+  @override
   Type type = Map;
 
-  Map<String, dynamic> validate(value) {
+  @override
+  Map<String, dynamic> validate(dynamic value) {
     initExceptionHandler('Map validation failed');
 
     try {
@@ -57,7 +60,9 @@ class BasicMapValidatorRule
           type.toString(), value?.runtimeType?.toString() ?? 'null'));
     }
 
-    final valueMap = Map.from(value).cast<String, dynamic>();
+    final valueMap = Map<dynamic, dynamic>.from(value as Map<dynamic, dynamic>)
+        .cast<String, dynamic>();
+
     final valueKeys = valueMap.keys;
     List<String> keysToRemove = [];
 
@@ -89,7 +94,7 @@ class BasicMapValidatorRule
       }
     };
 
-    valueMap.forEach((key, mapValue) {
+    valueMap.forEach((String key, dynamic mapValue) {
       bool keyFound = false;
 
       if (expectedFieldsMap != null) {
@@ -111,7 +116,7 @@ class BasicMapValidatorRule
             expectedFieldsMap[key] != mapValue) {
           handleException(ValidationException(
               'Value at $key is not as expected',
-              expectedFieldsMap[key],
+              expectedFieldsMap[key]?.toString(),
               mapValue?.toString()));
         } else if (expectedFieldsMap.containsKey(key) &&
             expectedFieldsMap[key] == mapValue) {
@@ -160,7 +165,7 @@ class MapValidatorRule extends BasicMapValidatorRule
       MapExtraFieldsBehaviour extraFieldsBehaviour =
           MapExtraFieldsBehaviour.keep,
       List<String> blacklistedKeys = const [],
-      Map<String, dynamic> additionalExpectedFieldsMap = null,
+      Map<String, dynamic> additionalExpectedFieldsMap,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi})
       : super(
           throwBehaviour: throwBehaviour,
@@ -170,8 +175,6 @@ class MapValidatorRule extends BasicMapValidatorRule
           disallowedKeys: blacklistedKeys,
         );
 
-  // TODO: see combinations and throw errors on invalid prop combinations
-
   final Map<String, ValidatorRule> validationMap;
 
   void withAdditionalExactFields(
@@ -179,10 +182,11 @@ class MapValidatorRule extends BasicMapValidatorRule
     expectedFieldsMap = additionalExpectedFieldsMap;
   }
 
+  @override
   Type type = Map;
 
   @override
-  Map<String, dynamic> validate(value) {
+  Map<String, dynamic> validate(dynamic value) {
     try {
       super.validate(value);
     } on MultiValidationException catch (_) {}

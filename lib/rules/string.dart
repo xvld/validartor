@@ -12,8 +12,8 @@ class StringValidatorRule
     with NullableValidation<String>, AdditionalValidators, MinMaxExactValidation
     implements ValidatorRule<String> {
   StringValidatorRule(
-      {nullable = false,
-      treatNullAs = null,
+      {bool nullable = false,
+      String treatNullAs,
       this.acceptEmpty = true,
       this.inputTrim = InputTrimType.none,
       this.length = double.infinity,
@@ -46,17 +46,19 @@ class StringValidatorRule
 
   List<String> allowedValues;
 
+  @override
   Type type = String;
 
-  static Map<InputType, RegExp> _inputTypeToRegExp = {
-    InputType.alphabetic: RegExp(r"[A-Za-z\s]*"),
-    InputType.alphaNumeric: RegExp(r"[\w\s]*"),
-    InputType.numeric: RegExp(r"^-?[0-9]\d*(\.\d+)?$"),
-    InputType.lowerCase: RegExp(r"[a-z\d\s]*"),
-    InputType.upperCase: RegExp(r"[A-Z\d\s]*")
+  static final Map<InputType, RegExp> _inputTypeToRegExp = {
+    InputType.alphabetic: RegExp(r'[A-Za-z\s]*'),
+    InputType.alphaNumeric: RegExp(r'[\w\s]*'),
+    InputType.numeric: RegExp(r'^-?[0-9]\d*(\.\d+)?$'),
+    InputType.lowerCase: RegExp(r'[a-z\d\s]*'),
+    InputType.upperCase: RegExp(r'[A-Z\d\s]*')
   };
 
-  String validate(value) {
+  @override
+  String validate(dynamic value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(type);
     } else if (nullable && value == null) {
@@ -64,10 +66,10 @@ class StringValidatorRule
     }
 
     if (!(value is String)) {
-      throw ValidationException.invalidType(type, value.runtimeType);
+      throw ValidationException.invalidType(type, value.runtimeType as Type);
     }
 
-    String stringValue = value;
+    String stringValue = value as String;
 
     if (inputTrim != InputTrimType.none) {
       switch (inputTrim) {
@@ -81,8 +83,7 @@ class StringValidatorRule
           stringValue = stringValue.trimRight();
           break;
         case InputTrimType.all:
-          stringValue =
-              stringValue.replaceAll(new RegExp(r"\s+\b|\b\s|\s|\b"), "");
+          stringValue = stringValue.replaceAll(RegExp(r'\s+\b|\b\s|\s|\b'), '');
           break;
         default:
       }
@@ -90,7 +91,7 @@ class StringValidatorRule
 
     if (!acceptEmpty && stringValue.isEmpty) {
       throw ValidationException(
-          'Value is empty', '""', value?.runtimeType ?? 'null');
+          'Value is empty', '""', value?.runtimeType as String ?? 'null');
     }
 
     validateMinMaxExact(stringValue.length, minLength, maxLength, length,
@@ -100,6 +101,6 @@ class StringValidatorRule
 
     validateAdditionalValidators(value);
 
-    return value;
+    return stringValue;
   }
 }

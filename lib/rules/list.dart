@@ -28,12 +28,13 @@ class ListValidatorRule<T extends dynamic>
       this.ordered,
       this.mustContainAllValues,
       List<bool Function(dynamic)> additionalValidators = const [],
-      this.elementRule = null,
+      this.elementRule,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
     this.nullable = nullable;
-    this.treatNullAs = treatNullAsEmptyList ? [] : null;
     this.throwBehaviour = throwBehaviour;
     this.additionalValidators = additionalValidators;
+
+    treatNullAs = treatNullAsEmptyList ? [] : null;
   }
 
   bool allowEmpty;
@@ -52,9 +53,11 @@ class ListValidatorRule<T extends dynamic>
 
   ValidatorRule elementRule;
 
+  @override
   Type type = List;
 
-  List<T> validate(value) {
+  @override
+  List<T> validate(dynamic value) {
     initExceptionHandler('List validation failed');
 
     try {
@@ -80,7 +83,7 @@ class ListValidatorRule<T extends dynamic>
     validateMinMaxExact(list.length, minLength, maxLength, length,
         checkedValueName: 'List length');
 
-    if (mustContain != null && list.indexOf(mustContain) == -1) {
+    if (mustContain != null && list.contains(mustContain)) {
       handleException(ValidationException(
           'List does not contain expected value',
           '$mustContain',
@@ -95,32 +98,38 @@ class ListValidatorRule<T extends dynamic>
           list.join(',')));
     }
 
-    if (unique && Set.from(list).length != list.length) {
+    if (unique && Set<dynamic>.from(list).length != list.length) {
       handleException(ValidationException('List contains non-unique values',
-          Set.from(list).join(','), list.join(',')));
+          Set<dynamic>.from(list).join(','), list.join(',')));
     }
 
     if (expectedValues != null) {
-      final map = {};
+      final map = <T, bool>{};
       // WILL NOT WORK, ['a', 'a'] expected = ['a']
       if (mustContainAllValues && expectedValues.length != list.length) {
-        return false;
+        handleException(ValidationException('List does not contain all values',
+            expectedValues.join(','), list.join(',')));
       }
 
       for (int i = 0; i < list.length; i++) {
         if (ordered) {
           if (expectedValues[i] != list[i]) {
-            return false;
+            handleException(ValidationException('List is not ordered',
+                expectedValues[i]?.toString(), list[i]?.toString()));
           }
         } else if (expectedValues.contains(list[i]) && mustContainAllValues) {
           map[list[i]] = true;
         } else if (!expectedValues.contains(list[i])) {
-          return false;
+          handleException(ValidationException(
+              'List does not contain expected value',
+              '!=${list[i]}',
+              list.join(',')));
         }
       }
 
       if (mustContainAllValues && map.keys.length != expectedValues.length) {
-        return false;
+        handleException(ValidationException('List does not contain all values',
+            expectedValues.join(','), list.join(',')));
       }
     }
 

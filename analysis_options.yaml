@@ -1,0 +1,6 @@
+include: package:pedantic/analysis_options.yaml
+
+linter:
+  rules:
+    prefer_spread_collections: false
+    omit_local_variable_types: false

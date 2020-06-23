@@ -4,7 +4,9 @@ import 'package:validartor/common/multi_exception_handler.dart';
 import './base_rule.dart';
 import '../common/validation_exception.dart';
 
-class MultiValidatorRule with MultiExceptionHandler implements ValidatorRule {
+class MultiValidatorRule
+    with MultiExceptionHandler
+    implements ValidatorRule<dynamic> {
   MultiValidatorRule(this.rules,
       {ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
     this.throwBehaviour = throwBehaviour;
@@ -12,15 +14,17 @@ class MultiValidatorRule with MultiExceptionHandler implements ValidatorRule {
 
   List<ValidatorRule> rules;
 
+  @override
   Type type = dynamic;
 
-  dynamic validate(value) {
+  @override
+  dynamic validate(dynamic value) {
     dynamic pass;
     initExceptionHandler('Multi validator failed');
 
     if (rules == null || rules.isEmpty) {
       throw handleException(ValidationException('No validators',
-          rules.map((rule) => rule?.runtimeType).join(','), value));
+          rules.map((rule) => rule?.runtimeType).join(','), value?.toString()));
     }
 
     for (ValidatorRule rule in rules) {

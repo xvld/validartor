@@ -18,8 +18,8 @@ void main() {
   });
 
   test('validates additional validators correctly', () {
-    final validator =
-        DynamicValidatorRule(additionalValidators: [(value) => value is int]);
+    final validator = DynamicValidatorRule(
+        additionalValidators: [(dynamic value) => value is int]);
 
     expect(validator.validate(5), 5);
     expect(() => validator.validate('string'),

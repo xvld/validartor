@@ -15,14 +15,14 @@ mixin NullableValidation<T> {
   bool nullable;
 
   /// What to return if [nullable] is true and value is null
-  T treatNullAs = null;
+  T treatNullAs;
 
   /// Validates if a value is nullable and null
   ///
   /// Returns [true] if value can be nullable and null
   /// Returns [false] if value can be nullable and is not null
   /// Throws [ValidationException] if valus cannot be nullable and is null
-  validateNullable(dynamic value) {
+  bool validateNullable(dynamic value) {
     if (!nullable && value == null) {
       throw ValidationException.nullException(T);
     } else if (nullable && value == null) {

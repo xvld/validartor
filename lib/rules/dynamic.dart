@@ -12,9 +12,11 @@ class DynamicValidatorRule
     this.additionalValidators = additionalValidators;
   }
 
+  @override
   Type type = dynamic;
 
-  dynamic validate(value) {
+  @override
+  dynamic validate(dynamic value) {
     if (validateNullable(value)) {
       return treatNullAs;
     }

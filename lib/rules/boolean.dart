@@ -13,7 +13,7 @@ class BooleanValidatorRule
       this.truthyValues = defaultTruthyValues,
       this.falsyValues = defaultFalsyValues}) {
     this.nullable = nullable;
-    this.treatNullAs = treatNullAsFalse ? false : null;
+    treatNullAs = treatNullAsFalse ? false : null;
   }
 
   bool allowTruthyFalsyValues; // Sanitizer
@@ -21,22 +21,24 @@ class BooleanValidatorRule
   List<dynamic> truthyValues;
   List<dynamic> falsyValues;
 
-  static const List<dynamic> defaultTruthyValues = ['true', 1];
-  static const List<dynamic> defaultFalsyValues = ['false', 0];
+  static const List defaultTruthyValues = <dynamic>['true', 1];
+  static const List defaultFalsyValues = <dynamic>['false', 0];
 
+  @override
   final Type type = bool;
 
+  @override
   bool validate(dynamic value) {
     if (validateNullable(value)) {
       return treatNullAs;
     }
 
     if (!allowTruthyFalsyValues && !(value is bool)) {
-      throw ValidationException.invalidType(type, value.runtimeType);
+      throw ValidationException.invalidType(type, value.runtimeType as Type);
     }
 
     if (allowTruthyFalsyValues && !(value is bool)) {
-      final notOneTruthyValuePassed = !truthyValues.any((truthyValue) {
+      final notOneTruthyValuePassed = !truthyValues.any((dynamic truthyValue) {
         if ((truthyValue.runtimeType == value.runtimeType &&
             truthyValue == value)) {
           value = true;
@@ -45,7 +47,7 @@ class BooleanValidatorRule
         return false;
       });
 
-      final notOneFalsyValuePassed = !falsyValues.any((falsyValue) {
+      final notOneFalsyValuePassed = !falsyValues.any((dynamic falsyValue) {
         if ((falsyValue.runtimeType == value.runtimeType &&
             falsyValue == value)) {
           value = false;
@@ -57,7 +59,7 @@ class BooleanValidatorRule
       if (notOneTruthyValuePassed && notOneFalsyValuePassed) {
         throw ValidationException.cannotConvert(
             (<dynamic>[]..addAll(truthyValues)..addAll(falsyValues)).join('|'),
-            value.runtimeType);
+            value.runtimeType as Type);
       }
     }
 
@@ -66,6 +68,6 @@ class BooleanValidatorRule
           expected.toString(), value.toString());
     }
 
-    return value;
+    return value as bool;
   }
 }

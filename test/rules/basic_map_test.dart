@@ -4,7 +4,7 @@ import 'package:validartor/rules/map.dart';
 import 'package:validartor/common/validation_exception.dart';
 
 void main() {
-  const map = {"a": "a", "b": 2, "c": null, "d": true};
+  const map = {'a': 'a', 'b': 2, 'c': null, 'd': true};
   test('Should validate non nullable map value correctly', () {
     final validator = BasicMapValidatorRule();
 
@@ -47,17 +47,19 @@ void main() {
   });
 
   test('Should validate blacklistedKeys map value correctly', () {
-    final validator = BasicMapValidatorRule(disallowedKeys: ["e"]);
+    final validator = BasicMapValidatorRule(disallowedKeys: ['e']);
     expect(validator.validate(map), map);
 
-    validator.disallowedKeys = ["a"];
+    validator.disallowedKeys = ['a'];
     expect(() => validator.validate(map),
         throwsA(isA<MultiValidationException>()));
   });
 
   test('Should validate expected map and keys', () {
-    Map expectedMap = Map.from(map).cast<String, dynamic>();
-    Map expectedMapWithExtra = Map.from(map).cast<String, dynamic>();
+    Map<String, dynamic> expectedMap =
+        Map<dynamic, dynamic>.from(map).cast<String, dynamic>();
+    Map<String, dynamic> expectedMapWithExtra =
+        Map<dynamic, dynamic>.from(map).cast<String, dynamic>();
     expectedMapWithExtra['e'] = 'e';
 
     final validator = BasicMapValidatorRule(expectedFieldsMap: expectedMap);
@@ -67,7 +69,7 @@ void main() {
     expect(() => validator2.validate(map),
         throwsA(isA<MultiValidationException>()));
 
-    expectedMap.remove("a");
+    expectedMap.remove('a');
     expect(validator.validate(map), map);
 
     validator.extraFieldsBehaviour = MapExtraFieldsBehaviour.remove;

@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:validartor/common/validation_exception.dart';
 import 'package:validartor/rules/base_rule.dart';
 
-expectValidationException(
+void expectValidationException(
     ValidatorRule validator, dynamic value, ValidationExceptionType type) {
   try {
     validator.validate(value);

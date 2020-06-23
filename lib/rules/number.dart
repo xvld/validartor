@@ -39,50 +39,54 @@ class NumberValidatorRule
 
   bool _valueIsNumber(dynamic value) => value is num;
 
+  @override
   Type type = num;
 
-  num validate(value) {
+  @override
+  num validate(dynamic value) {
     if (validateNullable(value)) {
       return treatNullAs;
     }
 
+    num numericValue;
+
     if (!allowStringValues && !_valueIsNumber(value)) {
-      throw ValidationException.invalidType(type, value?.runtimeType);
+      throw ValidationException.invalidType(type, value?.runtimeType as Type);
     } else if (allowStringValues && value is String) {
       try {
-        value = num.parse(value); // set to double to continue
+        numericValue = num.parse(value); // set to double to continue
       } catch (_) {
         throw ValidationException.cannotConvert(expected.toString(), type);
       }
     }
 
-    validateMinMaxExact(value, min, max, expected);
+    validateMinMaxExact(numericValue, min, max, expected);
 
-    if (notEqualTo != null && notEqualTo == value) {
+    if (notEqualTo != null && notEqualTo == numericValue) {
       throw ValidationException.notAsExpected(
-          "!=${notEqualTo.toString()}", value.toString());
+          '!=${notEqualTo.toString()}', value.toString());
     }
 
-    if (integer && value % 1 != 0) {
+    if (integer && numericValue % 1 != 0) {
       throw ValidationException(
           'Value is not an integer', 'int', value.toString(),
           type: ValidationExceptionType.invalidType);
     }
 
-    if (onlyPositive != null && value < 0) {
+    if (onlyPositive != null && numericValue < 0) {
       throw ValidationException(
-          'Value is not positive or zero', ">=0", value.toString(),
+          'Value is not positive or zero', '>=0', value.toString(),
           type: ValidationExceptionType.notAsExpected);
     }
 
-    if (onlyNegative != null && value > 0) {
+    if (onlyNegative != null && numericValue > 0) {
       throw ValidationException(
-          'Value is not negative or zero', "<=0", value.toString(),
+          'Value is not negative or zero', '<=0', value.toString(),
           type: ValidationExceptionType.notAsExpected);
     }
 
-    validateAdditionalValidators(value);
+    validateAdditionalValidators(numericValue);
 
-    return value;
+    return numericValue;
   }
 }

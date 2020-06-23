@@ -28,7 +28,7 @@ mixin MultiExceptionHandler {
     return multiValidationException;
   }
 
-  throwMultiValidationExceptionIfExists() {
+  void throwMultiValidationExceptionIfExists() {
     if (multiValidationException != null &&
         multiValidationException.exceptions.isNotEmpty) {
       throw multiValidationException;

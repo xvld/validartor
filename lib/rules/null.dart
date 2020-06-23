@@ -8,11 +8,7 @@ class NullValidatorRule implements ValidatorRule<Null> {
   Type type = Null;
 
   @override
-  Null validate(dynamic value) {
-    if (value != null) {
-      throw ValidationException.invalidType(null, value?.runtimeType as Type);
-    }
-
-    return null;
-  }
+  Null validate(dynamic value) => value != null
+      ? throw ValidationException.invalidType(null, value?.runtimeType as Type)
+      : null;
 }

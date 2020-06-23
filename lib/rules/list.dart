@@ -73,63 +73,69 @@ class ListValidatorRule<T extends dynamic>
           'Value is not a Map', type.toString(), value?.runtimeType ?? 'null'));
     }
 
-    final list = value as List<T>;
+    final convertedValue = value as List<T>;
 
-    if (!allowEmpty && list.isEmpty) {
-      throw handleException(ValidationException(
-          'List cannot be empty', 'list.length > 0', list.length.toString()));
+    if (!allowEmpty && convertedValue.isEmpty) {
+      throw handleException(ValidationException('List cannot be empty',
+          'list.length > 0', convertedValue.length.toString()));
     }
 
-    validateMinMaxExact(list.length, minLength, maxLength, length,
+    validateMinMaxExact(convertedValue.length, minLength, maxLength, length,
         checkedValueName: 'List length');
 
-    if (mustContain != null && list.contains(mustContain)) {
+    if (mustContain != null && convertedValue.contains(mustContain)) {
       handleException(ValidationException(
           'List does not contain expected value',
           '$mustContain',
-          list.join(',')));
+          convertedValue.join(',')));
     }
 
     if (mustContainPredicate != null &&
-        list.firstWhere(mustContainPredicate, orElse: () => null) == null) {
+        convertedValue.firstWhere(mustContainPredicate, orElse: () => null) ==
+            null) {
       handleException(ValidationException(
           'List does not contain expected value with predicate',
           'predicate given',
-          list.join(',')));
+          convertedValue.join(',')));
     }
 
-    if (unique && Set<dynamic>.from(list).length != list.length) {
-      handleException(ValidationException('List contains non-unique values',
-          Set<dynamic>.from(list).join(','), list.join(',')));
+    if (unique &&
+        Set<dynamic>.from(convertedValue).length != convertedValue.length) {
+      handleException(ValidationException(
+          'List contains non-unique values',
+          Set<dynamic>.from(convertedValue).join(','),
+          convertedValue.join(',')));
     }
 
     if (expectedValues != null) {
       final map = <T, bool>{};
       // WILL NOT WORK, ['a', 'a'] expected = ['a']
-      if (mustContainAllValues && expectedValues.length != list.length) {
+      if (mustContainAllValues &&
+          expectedValues.length != convertedValue.length) {
         handleException(ValidationException('List does not contain all values',
-            expectedValues.join(','), list.join(',')));
+            expectedValues.join(','), convertedValue.join(',')));
       }
 
-      for (int i = 0; i < list.length; i++) {
+      for (int i = 0; i < convertedValue.length; i++) {
         if (ordered) {
-          if (expectedValues[i] != list[i]) {
+          if (expectedValues[i] != convertedValue[i]) {
             handleException(ValidationException('List is not ordered',
-                expectedValues[i]?.toString(), list[i]?.toString()));
+                expectedValues[i]?.toString(), convertedValue[i]?.toString()));
           }
-        } else if (expectedValues.contains(list[i]) && mustContainAllValues) {
-          map[list[i]] = true;
-        } else if (!expectedValues.contains(list[i])) {
+        } else if (expectedValues.contains(convertedValue[i]) &&
+            mustContainAllValues) {
+          map[convertedValue[i]] = true;
+        } else if (!expectedValues.contains(convertedValue[i])) {
           handleException(ValidationException(
               'List does not contain expected value',
-              '!=${list[i]}',
-              list.join(',')));
+              '!=${convertedValue[i]}',
+              convertedValue.join(',')));
         }
       }
 
       if (mustContainAllValues && map.keys.length != expectedValues.length) {
         handleException(ValidationException('List does not contain all values',
-            expectedValues.join(','), list.join(',')));
+            expectedValues.join(','), convertedValue.join(',')));
       }
     }
 
@@ -140,6 +146,6 @@ class ListValidatorRule<T extends dynamic>
     }
 
     throwMultiValidationExceptionIfExists();
-    return list;
+    return convertedValue;
   }
 }

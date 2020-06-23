@@ -69,38 +69,39 @@ class StringValidatorRule
       throw ValidationException.invalidType(type, value.runtimeType as Type);
     }
 
-    String stringValue = value as String;
+    String convertedValue = value as String;
 
     if (inputTrim != InputTrimType.none) {
       switch (inputTrim) {
         case InputTrimType.both:
-          stringValue = stringValue.trim();
+          convertedValue = convertedValue.trim();
           break;
         case InputTrimType.left:
-          stringValue = stringValue.trimLeft();
+          convertedValue = convertedValue.trimLeft();
           break;
         case InputTrimType.right:
-          stringValue = stringValue.trimRight();
+          convertedValue = convertedValue.trimRight();
           break;
         case InputTrimType.all:
-          stringValue = stringValue.replaceAll(RegExp(r'\s+\b|\b\s|\s|\b'), '');
+          convertedValue =
+              convertedValue.replaceAll(RegExp(r'\s+\b|\b\s|\s|\b'), '');
           break;
         default:
       }
     }
 
-    if (!acceptEmpty && stringValue.isEmpty) {
+    if (!acceptEmpty && convertedValue.isEmpty) {
       throw ValidationException(
           'Value is empty', '""', value?.runtimeType as String ?? 'null');
     }
 
-    validateMinMaxExact(stringValue.length, minLength, maxLength, length,
+    validateMinMaxExact(convertedValue.length, minLength, maxLength, length,
         checkedValueName: 'String length');
 
     if (inputTypes.isNotEmpty) {}
 
     validateAdditionalValidators(value);
 
-    return stringValue;
+    return convertedValue;
   }
 }

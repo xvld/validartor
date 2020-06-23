@@ -19,7 +19,7 @@ class MultiValidatorRule
 
   @override
   dynamic validate(dynamic value) {
-    dynamic pass;
+    dynamic valueToReturn;
     initExceptionHandler('Multi validator failed');
 
     if (rules == null || rules.isEmpty) {
@@ -29,17 +29,15 @@ class MultiValidatorRule
 
     for (ValidatorRule rule in rules) {
       try {
-        pass = rule.validate(value);
+        valueToReturn = rule.validate(value);
         break;
       } on ValidationException catch (e) {
         handleException(e);
       }
     }
 
-    if (pass == null) {
-      throwMultiValidationExceptionIfExists();
-    }
-
-    return pass;
+    return valueToReturn == null
+        ? valueToReturn
+        : throwMultiValidationExceptionIfExists();
   }
 }

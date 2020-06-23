@@ -60,10 +60,11 @@ class BasicMapValidatorRule
           type.toString(), value?.runtimeType?.toString() ?? 'null'));
     }
 
-    final valueMap = Map<dynamic, dynamic>.from(value as Map<dynamic, dynamic>)
-        .cast<String, dynamic>();
+    final convertedValue =
+        Map<dynamic, dynamic>.from(value as Map<dynamic, dynamic>)
+            .cast<String, dynamic>();
 
-    final valueKeys = valueMap.keys;
+    final valueKeys = convertedValue.keys;
     List<String> keysToRemove = [];
 
     try {
@@ -94,12 +95,12 @@ class BasicMapValidatorRule
       }
     };
 
-    valueMap.forEach((String key, dynamic mapValue) {
+    convertedValue.forEach((String key, dynamic mapValue) {
       bool keyFound = false;
 
       if (expectedFieldsMap != null) {
         final expectedKeysMissing = expectedFieldsMap.keys
-            .where((expectedKey) => !valueMap.containsKey(expectedKey));
+            .where((expectedKey) => !convertedValue.containsKey(expectedKey));
 
         if (expectedKeysMissing.isNotEmpty) {
           expectedKeysMissing.forEach((expectedKeyMissing) {
@@ -153,8 +154,8 @@ class BasicMapValidatorRule
 
     throwMultiValidationExceptionIfExists();
 
-    keysToRemove.forEach(valueMap.remove);
-    return valueMap;
+    keysToRemove.forEach(convertedValue.remove);
+    return convertedValue;
   }
 }
 

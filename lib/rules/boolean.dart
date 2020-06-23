@@ -37,11 +37,13 @@ class BooleanValidatorRule
       throw ValidationException.invalidType(type, value.runtimeType as Type);
     }
 
+    bool convertedValue;
+
     if (allowTruthyFalsyValues && !(value is bool)) {
       final notOneTruthyValuePassed = !truthyValues.any((dynamic truthyValue) {
         if ((truthyValue.runtimeType == value.runtimeType &&
             truthyValue == value)) {
-          value = true;
+          convertedValue = true;
           return true;
         }
         return false;
@@ -50,7 +52,7 @@ class BooleanValidatorRule
       final notOneFalsyValuePassed = !falsyValues.any((dynamic falsyValue) {
         if ((falsyValue.runtimeType == value.runtimeType &&
             falsyValue == value)) {
-          value = false;
+          convertedValue = false;
           return true;
         }
         return false;
@@ -63,11 +65,11 @@ class BooleanValidatorRule
       }
     }
 
-    if (expected != null && value != expected) {
+    if (expected != null && convertedValue != expected) {
       throw ValidationException.notAsExpected(
           expected.toString(), value.toString());
     }
 
-    return value as bool;
+    return convertedValue;
   }
 }

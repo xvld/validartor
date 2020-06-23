@@ -20,7 +20,7 @@ class BasicMapValidatorRule
       bool treatNullAsEmptyMap = false,
       List<bool Function(dynamic)> additionalValidators = const [],
       this.extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
-      this.blacklistedKeys = const [],
+      this.disallowedKeys = const [],
       this.allowedKeys = const [],
       this.minNumOfKeys = 0,
       this.maxNumOfKeys = double.infinity,
@@ -35,7 +35,7 @@ class BasicMapValidatorRule
   MapExtraFieldsBehaviour extraFieldsBehaviour; // Sanitizer
 
   List<String> allowedKeys;
-  List<String> blacklistedKeys;
+  List<String> disallowedKeys;
   num minNumOfKeys;
   num maxNumOfKeys;
 
@@ -69,9 +69,9 @@ class BasicMapValidatorRule
     }
 
     final checkBlacklistForKey = (String key) {
-      if (blacklistedKeys.contains(key)) {
+      if (disallowedKeys.contains(key)) {
         handleException(ValidationException('Map contains blacklisted key/s',
-            'Not in ${blacklistedKeys.join(',')}', value.toString()));
+            'Not in ${disallowedKeys.join(',')}', value.toString()));
       }
     };
 
@@ -167,7 +167,7 @@ class MapValidatorRule extends BasicMapValidatorRule
           expectedFieldsMap: additionalExpectedFieldsMap,
           nullable: nullable,
           extraFieldsBehaviour: extraFieldsBehaviour,
-          blacklistedKeys: blacklistedKeys,
+          disallowedKeys: blacklistedKeys,
         );
 
   // TODO: see combinations and throw errors on invalid prop combinations

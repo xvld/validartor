@@ -47,10 +47,10 @@ void main() {
   });
 
   test('Should validate blacklistedKeys map value correctly', () {
-    final validator = BasicMapValidatorRule(blacklistedKeys: ["e"]);
+    final validator = BasicMapValidatorRule(disallowedKeys: ["e"]);
     expect(validator.validate(map), map);
 
-    validator.blacklistedKeys = ["a"];
+    validator.disallowedKeys = ["a"];
     expect(() => validator.validate(map),
         throwsA(isA<MultiValidationException>()));
   });

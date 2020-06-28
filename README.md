@@ -1,4 +1,5 @@
 # vali*dart*or ✅
+![Tests](https://github.com/xvld/validartor/workflows/Dart%20CI/badge.svg)
 
 An easy to use and extendable input validator library written in pure dart, with no extra dependencies
 

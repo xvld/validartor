@@ -39,6 +39,10 @@ class BooleanValidatorRule
 
     bool convertedValue;
 
+    if (value is bool) {
+      convertedValue = value;
+    }
+
     if (allowTruthyFalsyValues && !(value is bool)) {
       final notOneTruthyValuePassed = !truthyValues.any((dynamic truthyValue) {
         if ((truthyValue.runtimeType == value.runtimeType &&

@@ -176,6 +176,18 @@ class MapValidatorRule extends BasicMapValidatorRule
           disallowedKeys: blacklistedKeys,
         );
 
+  handleMultiException(MultiValidationException multiValidationException,
+      MultiValidationException exception) {
+    if (throwBehaviour == ThrowBehaviour.first) {
+      throw exception;
+    }
+
+    multiValidationException.exceptions.addAll(exception.exceptions);
+    return multiValidationException;
+  }
+
+  // TODO: see combinations and throw errors on invalid prop combinations
+
   final Map<String, ValidatorRule> validationMap;
 
   void withAdditionalExactFields(
@@ -187,21 +199,29 @@ class MapValidatorRule extends BasicMapValidatorRule
   Type type = Map;
 
   @override
-  Map<String, dynamic> validate(dynamic value) {
-    try {
-      super.validate(value);
-    } on MultiValidationException catch (_) {}
+  Map<String, dynamic> validate(value) {
+    MultiValidationException multiValidationException =
+        MultiValidationException('Map validation failed');
 
-    if (!(value is Map<String, ValidatorRule>)) {
-      // return false;
+    if (!nullable && value == null) {
+      throw handleException(ValidationException.nullException(type));
+    } else if (nullable && value == null) {
+      return value;
     }
 
-    if (!(value is Map<String, dynamic>)) {
-      // return false;
+    if (!(value is Map)) {
+      throw handleException(ValidationException('Value is not a Map',
+          type.toString(), value?.runtimeType?.toString() ?? 'null'));
     }
 
     validationMap.forEach((key, validator) {
-      validator.validate(value[key]);
+      try {
+        validator.validate(value[key]);
+      } on ValidationException catch (exception) {
+        handleException(exception);
+      } on MultiValidationException catch (exception) {
+        handleMultiException(multiValidationException, exception);
+      }
     });
 
     throwMultiValidationExceptionIfExists();

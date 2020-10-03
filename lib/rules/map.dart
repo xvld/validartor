@@ -176,16 +176,6 @@ class MapValidatorRule extends BasicMapValidatorRule
           disallowedKeys: blacklistedKeys,
         );
 
-  handleMultiException(MultiValidationException multiValidationException,
-      MultiValidationException exception) {
-    if (throwBehaviour == ThrowBehaviour.first) {
-      throw exception;
-    }
-
-    multiValidationException.exceptions.addAll(exception.exceptions);
-    return multiValidationException;
-  }
-
   // TODO: see combinations and throw errors on invalid prop combinations
 
   final Map<String, ValidatorRule> validationMap;
@@ -200,9 +190,6 @@ class MapValidatorRule extends BasicMapValidatorRule
 
   @override
   Map<String, dynamic> validate(value) {
-    MultiValidationException multiValidationException =
-        MultiValidationException('Map validation failed');
-
     if (!nullable && value == null) {
       throw handleException(ValidationException.nullException(type));
     } else if (nullable && value == null) {
@@ -219,8 +206,8 @@ class MapValidatorRule extends BasicMapValidatorRule
         validator.validate(value[key]);
       } on ValidationException catch (exception) {
         handleException(exception);
-      } on MultiValidationException catch (exception) {
-        handleMultiException(multiValidationException, exception);
+      } on MultiValidationException catch (multiException) {
+        handleMultiException(multiException);
       }
     });
 

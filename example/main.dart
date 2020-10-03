@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import '../lib/validartor.dart';
+import 'package:validartor/validartor.dart';
 
 void main(List<String> args) async {
   String url = 'https://jsonplaceholder.typicode.com/users';

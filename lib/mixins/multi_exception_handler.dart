@@ -34,4 +34,14 @@ mixin MultiExceptionHandler {
       throw multiValidationException;
     }
   }
+
+  MultiValidationException handleMultiException(
+      MultiValidationException exception) {
+    if (throwBehaviour == ThrowBehaviour.first) {
+      throw exception;
+    }
+
+    multiValidationException.exceptions.addAll(exception.exceptions);
+    return multiValidationException;
+  }
 }

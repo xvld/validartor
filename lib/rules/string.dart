@@ -15,15 +15,15 @@ class StringValidatorRule
       String treatNullAs,
       this.acceptEmpty = true,
       this.inputTrim = InputTrimType.none,
-      this.length = double.infinity,
-      this.minLength = double.negativeInfinity,
-      this.maxLength = double.infinity,
+      this.length,
+      this.minLength,
+      this.maxLength,
       this.pattern,
       this.mustContain,
       this.inputTypes = const [],
       this.ignoredCharsInInputTypeChecks = const [],
       this.allowedValues = const [],
-      List<bool Function(dynamic)> additionalValidators}) {
+      List<bool Function(dynamic)> additionalValidators = const []}) {
     this.nullable = nullable;
     this.treatNullAs = treatNullAs;
     this.additionalValidators = additionalValidators;

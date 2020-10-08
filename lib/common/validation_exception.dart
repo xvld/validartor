@@ -16,13 +16,24 @@ class ValidationException implements Exception {
       {this.type = ValidationExceptionType.general});
 
   /// The exception message
-  final dynamic message;
+  String message;
 
   /// The exception type
   final ValidationExceptionType type;
 
   /// The value the validator expected to receive
   final String expected;
+
+  bool _positionSet = false;
+
+  set fieldName(String value) {
+    if (!_positionSet) {
+      message = 'At position: [${value}] - ${message}';
+      _positionSet = true;
+    } else {
+      message = message.replaceFirst('[', '[$value][');
+    }
+  }
 
   /// The actual value it gor
   final String actual;
@@ -62,6 +73,11 @@ class ValidationException implements Exception {
           'All validators should pass',
           'Validators ${failedValidatorsIndices.join(',')} did not pass',
           type: ValidationExceptionType.customValidator);
+
+  @override
+  String toString() {
+    return '$message. expected: $expected, actual: $actual.';
+  }
 }
 
 /// An exception signalling that a validation has failed, with multiple errors
@@ -71,6 +87,23 @@ class MultiValidationException implements Exception {
   MultiValidationException(this.message, {this.exceptions = const []});
 
   final ValidationExceptionType type = ValidationExceptionType.multi;
-  final dynamic message;
+  String message;
   List<ValidationException> exceptions;
+
+  bool _positionSet = false;
+
+  set fieldName(String value) {
+    if (!_positionSet) {
+      message = 'At position: [${value}] - ${message}';
+      _positionSet = true;
+    } else {
+      message.replaceFirst('[', '[$value][');
+    }
+    exceptions.forEach((e) => e.fieldName = value);
+  }
+
+  @override
+  String toString() {
+    return '$message.\n${exceptions.map((e) => e.toString()).join('\n')}';
+  }
 }

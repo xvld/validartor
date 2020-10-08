@@ -8,12 +8,12 @@ mixin MinMaxExactValidation {
           expected.toString(), value.toString());
     }
 
-    if (value < min) {
+    if (min != null && value < min) {
       throw ValidationException('$checkedValueName is lower than min',
           '>=${min.toString()}', value.toString());
     }
 
-    if (value > max) {
+    if (max != null && value > max) {
       throw ValidationException('$checkedValueName is higher than max',
           '<=${max.toString()}', value.toString());
     }

@@ -19,7 +19,11 @@ mixin MultiExceptionHandler {
   ///
   /// Returns the [MultiValidationException] with the exception added
   /// Throws [ValidationException] if [throwBehaviour] is [ThrowBehaviour.first]
-  MultiValidationException handleException(ValidationException exception) {
+  MultiValidationException handleException(ValidationException exception,
+      {String fieldName}) {
+    if (fieldName != null) {
+      exception.fieldName = fieldName;
+    }
     if (throwBehaviour == ThrowBehaviour.first) {
       throw exception;
     }
@@ -36,7 +40,12 @@ mixin MultiExceptionHandler {
   }
 
   MultiValidationException handleMultiException(
-      MultiValidationException exception) {
+      MultiValidationException exception,
+      {String fieldName}) {
+    if (fieldName != null) {
+      exception.fieldName = fieldName;
+    }
+
     if (throwBehaviour == ThrowBehaviour.first) {
       throw exception;
     }

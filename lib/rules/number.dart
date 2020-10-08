@@ -13,8 +13,8 @@ class NumberValidatorRule
       this.integer = false,
       this.expected,
       this.notEqualTo,
-      this.min = double.negativeInfinity,
-      this.max = double.infinity,
+      this.min,
+      this.max,
       this.onlyPositive = false,
       this.onlyNegative = false,
       List<bool Function(dynamic)> additionalValidators = const [],
@@ -56,6 +56,8 @@ class NumberValidatorRule
       } catch (_) {
         throw ValidationException.cannotConvert(expected.toString(), type);
       }
+    } else if (value is num) {
+      convertedValue = value;
     }
 
     validateMinMaxExact(convertedValue, min, max, expected);

@@ -17,8 +17,8 @@ class ListValidatorRule<T extends dynamic>
       {bool nullable = false,
       bool treatNullAsEmptyList = false,
       this.allowEmpty = true,
-      this.minLength = 0,
-      this.maxLength = double.infinity,
+      this.minLength,
+      this.maxLength,
       this.length,
       this.mustContain,
       this.mustContainPredicate,
@@ -27,7 +27,6 @@ class ListValidatorRule<T extends dynamic>
       this.ordered,
       this.mustContainAllValues,
       List<bool Function(dynamic)> additionalValidators = const [],
-      this.elementRule,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
     this.nullable = nullable;
     this.throwBehaviour = throwBehaviour;
@@ -35,6 +34,9 @@ class ListValidatorRule<T extends dynamic>
 
     treatNullAs = treatNullAsEmptyList ? [] : null;
   }
+
+  factory ListValidatorRule.forEach(ValidatorRule elementRule) =>
+      ListValidatorRule()..elementRule = elementRule;
 
   bool allowEmpty;
 

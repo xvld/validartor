@@ -22,8 +22,8 @@ class BasicMapValidatorRule
       this.extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
       this.disallowedKeys = const [],
       this.allowedKeys = const [],
-      this.minNumOfKeys = 0,
-      this.maxNumOfKeys = double.infinity,
+      this.minNumOfKeys,
+      this.maxNumOfKeys,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
     this.nullable = nullable;
     this.throwBehaviour = throwBehaviour;
@@ -42,6 +42,15 @@ class BasicMapValidatorRule
 
   @override
   Type type = Map;
+
+  bool checkBlacklistForKey(String key) {
+    final isDisallowed = disallowedKeys.contains(key);
+    if (isDisallowed) {
+      handleException(ValidationException('Map contains disallowed key/s',
+          'Not in [${disallowedKeys.join(',')}]', key));
+    }
+    return isDisallowed;
+  }
 
   @override
   Map<String, dynamic> validate(dynamic value) {
@@ -73,13 +82,6 @@ class BasicMapValidatorRule
     } on ValidationException catch (e) {
       handleException(e);
     }
-
-    final checkBlacklistForKey = (String key) {
-      if (disallowedKeys.contains(key)) {
-        handleException(ValidationException('Map contains blacklisted key/s',
-            'Not in ${disallowedKeys.join(',')}', value.toString()));
-      }
-    };
 
     final checkExtraFieldsBehaviour = (String key) {
       switch (extraFieldsBehaviour) {
@@ -190,6 +192,8 @@ class MapValidatorRule extends BasicMapValidatorRule
 
   @override
   Map<String, dynamic> validate(value) {
+    initExceptionHandler('Map validation failed');
+
     if (!nullable && value == null) {
       throw handleException(ValidationException.nullException(type));
     } else if (nullable && value == null) {
@@ -203,11 +207,13 @@ class MapValidatorRule extends BasicMapValidatorRule
 
     validationMap.forEach((key, validator) {
       try {
-        validator.validate(value[key]);
+        if (!checkBlacklistForKey(key)) {
+          validator.validate(value[key]);
+        }
       } on ValidationException catch (exception) {
-        handleException(exception);
+        handleException(exception, fieldName: key);
       } on MultiValidationException catch (multiException) {
-        handleMultiException(multiException);
+        handleMultiException(multiException, fieldName: key);
       }
     });
 

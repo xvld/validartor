@@ -8,8 +8,7 @@ void main(List<String> args) async {
   var response = await http.get(url);
 
   var body = json.decode(response.body);
-  var validator = ListValidatorRule<dynamic>(
-      elementRule: MapValidatorRule({
+  var validator = ListValidatorRule<dynamic>.forEach(MapValidatorRule({
     'id': NumberValidatorRule(),
     'name': NumberValidatorRule(),
     'username': StringValidatorRule(),

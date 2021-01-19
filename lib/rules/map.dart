@@ -43,7 +43,7 @@ class BasicMapValidatorRule
   @override
   Type type = Map;
 
-  bool checkBlacklistForKey(String key) {
+  bool checkDisallowedListForKey(String key) {
     final isDisallowed = disallowedKeys.contains(key);
     if (isDisallowed) {
       handleException(ValidationException('Map contains disallowed key/s',
@@ -113,7 +113,7 @@ class BasicMapValidatorRule
           });
         }
 
-        checkBlacklistForKey(key);
+        checkDisallowedListForKey(key);
 
         if (expectedFieldsMap.containsKey(key) &&
             expectedFieldsMap[key] != mapValue) {
@@ -134,7 +134,7 @@ class BasicMapValidatorRule
           checkExtraFieldsBehaviour(key);
         }
       } else if (allowedKeys.isNotEmpty) {
-        checkBlacklistForKey(key);
+        checkDisallowedListForKey(key);
 
         if (!keyFound && allowedKeys.contains(key)) {
           keyFound = true;
@@ -144,7 +144,7 @@ class BasicMapValidatorRule
           checkExtraFieldsBehaviour(key);
         }
       } else {
-        checkBlacklistForKey(key);
+        checkDisallowedListForKey(key);
       }
     });
 
@@ -167,7 +167,7 @@ class MapValidatorRule extends BasicMapValidatorRule
       {bool nullable = false,
       MapExtraFieldsBehaviour extraFieldsBehaviour =
           MapExtraFieldsBehaviour.keep,
-      List<String> blacklistedKeys = const [],
+      List<String> disallowedKeys = const [],
       Map<String, dynamic> additionalExpectedFieldsMap,
       ThrowBehaviour throwBehaviour = ThrowBehaviour.multi})
       : super(
@@ -175,7 +175,7 @@ class MapValidatorRule extends BasicMapValidatorRule
           expectedFieldsMap: additionalExpectedFieldsMap,
           nullable: nullable,
           extraFieldsBehaviour: extraFieldsBehaviour,
-          disallowedKeys: blacklistedKeys,
+          disallowedKeys: disallowedKeys,
         );
 
   // TODO: see combinations and throw errors on invalid prop combinations
@@ -207,7 +207,7 @@ class MapValidatorRule extends BasicMapValidatorRule
 
     validationMap.forEach((key, validator) {
       try {
-        if (!checkBlacklistForKey(key)) {
+        if (!checkDisallowedListForKey(key)) {
           validator.validate(value[key]);
         }
       } on ValidationException catch (exception) {

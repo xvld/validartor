@@ -23,7 +23,7 @@ void main() {
         'city': StringValidatorRule(),
         'zipcode': StringValidatorRule(allowedInputTypes: [InputType.numeric]),
         'geo': MapValidatorRule({'lat': NullValidatorRule()},
-            blacklistedKeys: ["lat"])
+            disallowedKeys: ["lat"])
       }),
       'phone': StringValidatorRule(),
       'website': StringValidatorRule(),

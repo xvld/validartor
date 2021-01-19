@@ -13,6 +13,7 @@ class StringValidatorRule
   StringValidatorRule(
       {bool nullable = false,
       String treatNullAs,
+      this.stringifyInput = false,
       this.acceptEmpty = true,
       this.inputTrim = InputTrimType.none,
       this.length,
@@ -28,6 +29,7 @@ class StringValidatorRule
     this.additionalValidators = additionalValidators;
   }
 
+  bool stringifyInput;
   bool acceptEmpty;
   InputTrimType inputTrim; // Sanitizer
 
@@ -119,12 +121,15 @@ class StringValidatorRule
     } else if (nullable && value == null) {
       return treatNullAs;
     }
+    String convertedValue;
 
-    if (!(value is String)) {
+    if (!(value is String) && !stringifyInput) {
       throw ValidationException.invalidType(type, value.runtimeType as Type);
+    } else if (!(value is String) && stringifyInput) {
+      convertedValue = value.toString();
+    } else {
+      convertedValue = value as String;
     }
-
-    String convertedValue = value as String;
 
     if (inputTrim != InputTrimType.none) {
       convertedValue = _trimInput(convertedValue);

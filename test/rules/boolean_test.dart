@@ -16,7 +16,6 @@ void main() {
   test('Should validate nullable boolean value correctly', () {
     final validator = BooleanValidatorRule(nullable: true);
 
-    expect(validator.validate(true), true);
     expect(validator.validate(null), null);
   });
 

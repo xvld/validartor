@@ -117,7 +117,7 @@ A shorthand validator to ensure null value
 | `allowStringValues`    | `false`                   | `bool`                     | if `true`, allows for numbers as strings and will try to parse them | ✅                                       |
 | `integer`              | `false`                   | `bool`                     | Whether number must be an integer                                   | ❌                                       |
 | `expected`             | `null`                    | `num`                      | The expected value.                                                 | ❌                                       |
-| `notEqualTo`           | `null`                    | `num`                      | The expected value should not be.                                   | ❌                                       |
+| `notEqualTo`           | `null`                    | `num`                      | The value must not be this.                                         | ❌                                       |
 | `min`                  | `double.negativeInfinity` | `num`                      | The value must be >= min.                                           | ❌                                       |
 | `max`                  | `double.infinity`         | `num`                      | The value must be <= max.                                           | ❌                                       |
 | `onlyPositive`         | `false`                   | `bool`                     | Whether number must be positive (or 0)                              | ❌                                       |

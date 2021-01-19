@@ -23,6 +23,13 @@ void main() {
     expect(validator.validate(null), null);
   });
 
+  test('Should validate nullable string with treatNullAs value correctly', () {
+    final validator =
+        StringValidatorRule(nullable: true, treatNullAs: testString);
+
+    expect(validator.validate(null), testString);
+  });
+
   test('Should reject non string value', () {
     final validator = StringValidatorRule();
 

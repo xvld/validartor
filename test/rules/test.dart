@@ -21,7 +21,7 @@ void main() {
         'street': StringValidatorRule(),
         'suite': StringValidatorRule(),
         'city': StringValidatorRule(),
-        'zipcode': StringValidatorRule(inputTypes: [InputType.numeric]),
+        'zipcode': StringValidatorRule(allowedInputTypes: [InputType.numeric]),
         'geo': MapValidatorRule({'lat': NullValidatorRule()},
             blacklistedKeys: ["lat"])
       }),

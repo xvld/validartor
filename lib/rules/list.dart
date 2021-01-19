@@ -59,7 +59,7 @@ class ListValidatorRule<T extends dynamic>
 
   @override
   List<T> validate(dynamic value) {
-    initExceptionHandler('List validation failed');
+    initValidationExceptionHandler('List validation failed');
 
     try {
       if (validateNullable(value)) {

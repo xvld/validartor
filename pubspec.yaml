@@ -8,7 +8,7 @@ issue_tracker: https://github.com/xvld/validartor/issues
 documentation: https://github.com/xvld/validartor/blob/master/README.md
 
 environment:
-  sdk: '>=2.1.0 <3.0.0'
+  sdk: '>=2.3.0 <3.0.0'
 
 dependencies:
   logging: ^0.11.4

@@ -1,4 +1,5 @@
 # vali*dart*or ✅
+
 ![Tests](https://github.com/xvld/validartor/workflows/Dart%20CI/badge.svg)
 
 An easy to use and extendable input validator library written in pure dart, with no extra dependencies
@@ -66,12 +67,12 @@ try {
 
 ## Roadmap
 
-- [ ] Basic validation rules:
+- [x] Basic validation rules:
   - [x] boolean
   - [x] dynamic (any value)
   - [x] number
   - [x] null
-  - [ ] string **WIP**
+  - [x] string
 - [ ] Advanced validation rules:
   - [x] Multi
   - [ ] List **WIP**

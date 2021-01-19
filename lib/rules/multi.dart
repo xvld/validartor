@@ -20,7 +20,7 @@ class MultiValidatorRule
   @override
   dynamic validate(dynamic value) {
     dynamic valueToReturn;
-    initExceptionHandler('Multi validator failed');
+    initValidationExceptionHandler('Multi validator failed');
 
     if (rules == null || rules.isEmpty) {
       throw handleException(ValidationException('No validators',

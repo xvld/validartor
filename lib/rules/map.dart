@@ -54,7 +54,7 @@ class BasicMapValidatorRule
 
   @override
   Map<String, dynamic> validate(dynamic value) {
-    initExceptionHandler('Map validation failed');
+    initValidationExceptionHandler('Map validation failed');
 
     try {
       if (validateNullable(value)) {
@@ -192,7 +192,7 @@ class MapValidatorRule extends BasicMapValidatorRule
 
   @override
   Map<String, dynamic> validate(value) {
-    initExceptionHandler('Map validation failed');
+    initValidationExceptionHandler('Map validation failed');
 
     if (!nullable && value == null) {
       throw handleException(ValidationException.nullException(type));

@@ -10,7 +10,7 @@ mixin MultiExceptionHandler {
   ThrowBehaviour throwBehaviour = ThrowBehaviour.multi;
   MultiValidationException multiValidationException;
 
-  void initExceptionHandler(String message) {
+  void initValidationExceptionHandler(String message) {
     multiValidationException =
         MultiValidationException(message, exceptions: []);
   }

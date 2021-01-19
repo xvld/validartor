@@ -17,7 +17,7 @@ void main(List<String> args) async {
       'street': StringValidatorRule(),
       'suite': StringValidatorRule(),
       'city': StringValidatorRule(),
-      'zipcode': StringValidatorRule(inputTypes: [InputType.numeric]),
+      'zipcode': StringValidatorRule(allowedInputTypes: [InputType.numeric]),
       'geo': BasicMapValidatorRule(allowedKeys: ['lat', 'lon'])
     }),
     'phone': StringValidatorRule(),

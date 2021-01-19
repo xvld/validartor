@@ -18,10 +18,9 @@ class StringValidatorRule
       this.length,
       this.minLength,
       this.maxLength,
-      this.pattern,
       this.mustContain,
-      this.inputTypes = const [],
-      this.ignoredCharsInInputTypeChecks = const [],
+      this.allowedPatterns = const [],
+      this.allowedInputTypes = const [],
       this.allowedValues = const [],
       List<bool Function(dynamic)> additionalValidators = const []}) {
     this.nullable = nullable;
@@ -36,12 +35,10 @@ class StringValidatorRule
   num minLength;
   num maxLength;
 
-  String pattern;
   String mustContain;
 
-  List<InputType> inputTypes;
-
-  List<String> ignoredCharsInInputTypeChecks;
+  List<InputType> allowedInputTypes;
+  List<RegExp> allowedPatterns;
 
   List<String> allowedValues;
 
@@ -55,6 +52,65 @@ class StringValidatorRule
     InputType.lowerCase: RegExp(r'[a-z\d\s]*'),
     InputType.upperCase: RegExp(r'[A-Z\d\s]*')
   };
+
+  void _validateInputTypes(String convertedValue) {
+    List<InputType> failedInputTypeValidators = <InputType>[];
+    List<RegExp> failedPatternValidators = <RegExp>[];
+
+    final anyInputTypesPassed = !allowedInputTypes.any((allowedInputType) {
+      if (!_inputTypeToRegExp[allowedInputType].hasMatch(convertedValue)) {
+        failedInputTypeValidators.add(allowedInputType);
+        return false;
+      }
+
+      return true;
+    });
+
+    bool additionalAllowedPatternsPassed = false;
+
+    if (allowedPatterns.isNotEmpty) {
+      additionalAllowedPatternsPassed = allowedPatterns.any((allowedPattern) {
+        if (!allowedPattern.hasMatch(convertedValue)) {
+          failedPatternValidators.add(allowedPattern);
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    if (!anyInputTypesPassed && !additionalAllowedPatternsPassed) {
+      final List<String> failedInputs = [
+        ...failedPatternValidators.map((f) => f.pattern),
+        ...failedInputTypeValidators.map((f) => f.toString())
+      ];
+
+      throw ValidationException(
+          'Value did not pass any custom input types or pattern validation',
+          'At least one input type validation or pattern should pass',
+          'Input types validations ${failedInputs.join(',')} did not pass',
+          type: ValidationExceptionType.customValidator);
+    }
+  }
+
+  String _trimInput(String convertedValue) {
+    switch (inputTrim) {
+      case InputTrimType.both:
+        return convertedValue.trim();
+        break;
+      case InputTrimType.left:
+        return convertedValue.trimLeft();
+        break;
+      case InputTrimType.right:
+        return convertedValue.trimRight();
+        break;
+      case InputTrimType.all:
+        return convertedValue.replaceAll(RegExp(r'\s+\b|\b\s|\s|\b'), '');
+        break;
+      default:
+        return convertedValue;
+    }
+  }
 
   @override
   String validate(dynamic value) {
@@ -71,33 +127,30 @@ class StringValidatorRule
     String convertedValue = value as String;
 
     if (inputTrim != InputTrimType.none) {
-      switch (inputTrim) {
-        case InputTrimType.both:
-          convertedValue = convertedValue.trim();
-          break;
-        case InputTrimType.left:
-          convertedValue = convertedValue.trimLeft();
-          break;
-        case InputTrimType.right:
-          convertedValue = convertedValue.trimRight();
-          break;
-        case InputTrimType.all:
-          convertedValue =
-              convertedValue.replaceAll(RegExp(r'\s+\b|\b\s|\s|\b'), '');
-          break;
-        default:
-      }
+      convertedValue = _trimInput(convertedValue);
     }
 
     if (!acceptEmpty && convertedValue.isEmpty) {
-      throw ValidationException(
-          'Value is empty', '""', value?.runtimeType as String ?? 'null');
+      throw ValidationException.notAsExpected('Non empty string', '');
+    }
+
+    if (mustContain != null && !convertedValue.contains(mustContain)) {
+      throw ValidationException.notAsExpected(
+          'Must contain $mustContain', convertedValue);
+    }
+
+    if (allowedValues.isNotEmpty &&
+        !allowedValues.any((allowedValue) => convertedValue == allowedValue)) {
+      throw ValidationException.notAsExpected(
+          'Value must be one of ${allowedValues.join(',')}', convertedValue);
     }
 
     validateMinMaxExact(convertedValue.length, minLength, maxLength, length,
         checkedValueName: 'String length');
 
-    if (inputTypes.isNotEmpty) {}
+    if (allowedInputTypes.isNotEmpty) {
+      _validateInputTypes(convertedValue);
+    }
 
     validateAdditionalValidators(value);
 

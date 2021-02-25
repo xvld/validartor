@@ -24,6 +24,7 @@ mixin MultiExceptionHandler {
     if (fieldName != null) {
       exception.fieldName = fieldName;
     }
+
     if (throwBehaviour == ThrowBehaviour.first) {
       throw exception;
     }

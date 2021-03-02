@@ -15,8 +15,8 @@ class NumberValidatorRule
       this.notEqualTo,
       this.min,
       this.max,
-      this.onlyPositive = false,
-      this.onlyNegative = false,
+      this.onlyPositive,
+      this.onlyNegative,
       List<bool Function(dynamic)> additionalValidators = const [],
       num treatNullAs}) {
     this.nullable = nullable;

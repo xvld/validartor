@@ -1,59 +1,42 @@
-import '../mixins/min_max_validator.dart';
-
 import './base_rule.dart';
-import '../mixins/additional_validators.dart';
+import './basic_map.dart';
+
 import '../common/enums.dart';
-import '../mixins/multi_exception_handler.dart';
-import '../mixins/null_validator.dart';
 import '../common/validation_exception.dart';
 
-class BasicMapValidatorRule
-    with
-        MultiExceptionHandler,
-        NullableValidation<Map<String, dynamic>>,
-        AdditionalValidators,
-        MinMaxExactValidation
+class MapValidatorRule extends BasicMapValidatorRule
     implements ValidatorRule<Map<String, dynamic>> {
-  BasicMapValidatorRule(
-      {this.expectedFieldsMap,
-      bool nullable = false,
+  MapValidatorRule(this.validationMap,
+      {bool nullable = false,
+      MapExtraFieldsBehaviour extraFieldsBehaviour =
+          MapExtraFieldsBehaviour.keep,
+      List<String> disallowedKeys = const [],
+      Map<String, dynamic> additionalExpectedFieldsMap = const {},
       bool treatNullAsEmptyMap = false,
-      List<bool Function(dynamic)> additionalValidators = const [],
-      this.extraFieldsBehaviour = MapExtraFieldsBehaviour.keep,
-      this.disallowedKeys = const [],
-      this.allowedKeys = const [],
-      this.minNumOfKeys,
-      this.maxNumOfKeys,
-      ThrowBehaviour throwBehaviour = ThrowBehaviour.multi}) {
-    this.nullable = nullable;
-    this.throwBehaviour = throwBehaviour;
-    this.additionalValidators = additionalValidators;
-
-    treatNullAs = treatNullAsEmptyMap ? <String, dynamic>{} : null;
+      ThrowBehaviour throwBehaviour = ThrowBehaviour.multi})
+      : super(
+            throwBehaviour: throwBehaviour,
+            expectedFieldsMap: additionalExpectedFieldsMap,
+            nullable: nullable,
+            extraFieldsBehaviour: extraFieldsBehaviour,
+            disallowedKeys: disallowedKeys,
+            treatNullAsEmptyMap: treatNullAsEmptyMap) {
+    assert(validationMap.keys
+        .toList()
+        .every((key) => !disallowedKeys.contains(key)));
+    assert(expectedFieldsMap?.keys
+            ?.toList()
+            ?.every((key) => !disallowedKeys.contains(key)) ??
+        true);
   }
 
-  Map<String, dynamic> expectedFieldsMap;
-  MapExtraFieldsBehaviour extraFieldsBehaviour; // Sanitizer
-
-  List<String> allowedKeys;
-  List<String> disallowedKeys;
-  num minNumOfKeys;
-  num maxNumOfKeys;
+  final Map<String, ValidatorRule> validationMap;
 
   @override
   Type type = Map;
 
-  bool checkDisallowedListForKey(String key) {
-    final isDisallowed = disallowedKeys.contains(key);
-    if (isDisallowed) {
-      handleException(ValidationException('Map contains disallowed key/s',
-          'Not in [${disallowedKeys.join(',')}]', key));
-    }
-    return isDisallowed;
-  }
-
   @override
-  Map<String, dynamic> validate(dynamic value) {
+  Map<String, dynamic> validate(value) {
     initValidationExceptionHandler('Map validation failed');
 
     try {
@@ -65,151 +48,53 @@ class BasicMapValidatorRule
     }
 
     if (!(value is Map)) {
-      throw handleException(ValidationException('Value is not a Map',
-          type.toString(), value?.runtimeType?.toString() ?? 'null'));
+      throw handleException(
+          ValidationException.invalidType(type, value.runtimeType));
     }
 
     final convertedValue =
         Map<dynamic, dynamic>.from(value as Map<dynamic, dynamic>)
             .cast<String, dynamic>();
 
-    final valueKeys = convertedValue.keys;
     List<String> keysToRemove = [];
 
-    try {
-      validateMinMaxExact(valueKeys.length, minNumOfKeys, maxNumOfKeys, null,
-          checkedValueName: 'Map keys');
-    } on ValidationException catch (e) {
-      handleException(e);
+    final expectedKeysMissing = [
+      ...expectedFieldsMap.keys,
+      ...validationMap.keys
+    ].where((expectedKey) => !convertedValue.containsKey(expectedKey));
+
+    if (expectedKeysMissing.isNotEmpty) {
+      expectedKeysMissing.forEach((expectedKeyMissing) {
+        handleException(ValidationException(
+            'Value is missing a key $expectedKeyMissing',
+            expectedKeyMissing,
+            expectedKeyMissing?.toString(),
+            type: ValidationExceptionType.notAsExpected));
+      });
     }
 
-    final checkExtraFieldsBehaviour = (String key) {
-      switch (extraFieldsBehaviour) {
-        case MapExtraFieldsBehaviour.error:
-          handleException(ValidationException('Map contains key $key',
-              'To not contain $key', value.toString()));
-          break;
-        case MapExtraFieldsBehaviour.remove:
+    convertedValue.forEach((key, internalValue) {
+      if (checkDisallowedListForKey(key)) {
+        return;
+      }
+
+      final validator = validationMap[key];
+
+      if (validator == null) {
+        if (expectedFieldsMap[key] != null &&
+            (expectedFieldsMap[key].runtimeType != internalValue.runtimeType ||
+                expectedFieldsMap[key] != internalValue)) {
+          handleException(ValidationException.notAsExpected(
+              expectedFieldsMap[key]?.toString(), internalValue?.toString()));
+        } else if (checkExtraFieldsBehaviour(key, internalValue) != null) {
           keysToRemove.add(key);
-          break;
-        case MapExtraFieldsBehaviour.keep:
-        default:
+        }
+
+        return;
       }
-    };
 
-    convertedValue.forEach((String key, dynamic mapValue) {
-      bool keyFound = false;
-
-      if (expectedFieldsMap != null) {
-        final expectedKeysMissing = expectedFieldsMap.keys
-            .where((expectedKey) => !convertedValue.containsKey(expectedKey));
-
-        if (expectedKeysMissing.isNotEmpty) {
-          expectedKeysMissing.forEach((expectedKeyMissing) {
-            handleException(ValidationException(
-                'Value is missing a key $expectedKeyMissing',
-                expectedKeyMissing,
-                expectedKeyMissing?.toString()));
-          });
-        }
-
-        checkDisallowedListForKey(key);
-
-        if (expectedFieldsMap.containsKey(key) &&
-            expectedFieldsMap[key] != mapValue) {
-          handleException(ValidationException(
-              'Value at $key is not as expected',
-              expectedFieldsMap[key]?.toString(),
-              mapValue?.toString()));
-        } else if (expectedFieldsMap.containsKey(key) &&
-            expectedFieldsMap[key] == mapValue) {
-          keyFound = true;
-        }
-
-        if (!keyFound && allowedKeys.isNotEmpty && allowedKeys.contains(key)) {
-          keyFound = true;
-        }
-
-        if (!keyFound) {
-          checkExtraFieldsBehaviour(key);
-        }
-      } else if (allowedKeys.isNotEmpty) {
-        checkDisallowedListForKey(key);
-
-        if (!keyFound && allowedKeys.contains(key)) {
-          keyFound = true;
-        }
-
-        if (!keyFound) {
-          checkExtraFieldsBehaviour(key);
-        }
-      } else {
-        checkDisallowedListForKey(key);
-      }
-    });
-
-    try {
-      validateAdditionalValidators(value);
-    } on ValidationException catch (e) {
-      handleException(e);
-    }
-
-    throwMultiValidationExceptionIfExists();
-
-    keysToRemove.forEach(convertedValue.remove);
-    return convertedValue;
-  }
-}
-
-class MapValidatorRule extends BasicMapValidatorRule
-    implements ValidatorRule<Map<String, dynamic>> {
-  MapValidatorRule(this.validationMap,
-      {bool nullable = false,
-      MapExtraFieldsBehaviour extraFieldsBehaviour =
-          MapExtraFieldsBehaviour.keep,
-      List<String> disallowedKeys = const [],
-      Map<String, dynamic> additionalExpectedFieldsMap,
-      ThrowBehaviour throwBehaviour = ThrowBehaviour.multi})
-      : super(
-          throwBehaviour: throwBehaviour,
-          expectedFieldsMap: additionalExpectedFieldsMap,
-          nullable: nullable,
-          extraFieldsBehaviour: extraFieldsBehaviour,
-          disallowedKeys: disallowedKeys,
-        );
-
-  // TODO: see combinations and throw errors on invalid prop combinations
-
-  final Map<String, ValidatorRule> validationMap;
-
-  void withAdditionalExactFields(
-      Map<String, dynamic> additionalExpectedFieldsMap) {
-    expectedFieldsMap = additionalExpectedFieldsMap;
-  }
-
-  @override
-  Type type = Map;
-
-  @override
-  Map<String, dynamic> validate(value) {
-    initValidationExceptionHandler('Map validation failed');
-
-    if (!nullable && value == null) {
-      throw handleException(ValidationException.nullException(type));
-    } else if (nullable && value == null) {
-      return value;
-    }
-
-    if (!(value is Map)) {
-      throw handleException(ValidationException('Value is not a Map',
-          type.toString(), value?.runtimeType?.toString() ?? 'null'));
-    }
-
-    validationMap.forEach((key, validator) {
       try {
-        if (!checkDisallowedListForKey(key)) {
-          validator.validate(value[key]);
-        }
+        validator.validate(convertedValue[key]);
       } on ValidationException catch (exception) {
         handleException(exception, fieldName: key);
       } on MultiValidationException catch (multiException) {
@@ -219,6 +104,8 @@ class MapValidatorRule extends BasicMapValidatorRule
 
     throwMultiValidationExceptionIfExists();
 
-    return value;
+    keysToRemove.forEach(convertedValue.remove);
+
+    return convertedValue;
   }
 }

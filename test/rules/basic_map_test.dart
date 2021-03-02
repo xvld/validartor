@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:validartor/common/enums.dart';
-import 'package:validartor/rules/map.dart';
+import 'package:validartor/rules/basic_map.dart';
 import 'package:validartor/common/validation_exception.dart';
 
 void main() {

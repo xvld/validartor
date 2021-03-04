@@ -16,7 +16,7 @@ class BasicMapValidatorRule
         MinMaxExactValidation
     implements ValidatorRule<Map<String, dynamic>> {
   BasicMapValidatorRule(
-      {this.expectedFieldsMap,
+      {this.expectedFieldsMap = const {},
       bool nullable = false,
       bool treatNullAsEmptyMap = false,
       List<bool Function(dynamic)> additionalValidators = const [],
